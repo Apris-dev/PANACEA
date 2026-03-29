@@ -2,7 +2,7 @@
 
 #include "VRISwapchain.h"
 #include "sstl/Array.h"
-#include "sstl/Memory.h"
+#include "sptr/Memory.h"
 #include "sstl/Queue.h"
 #include "VRI/VRIResources.h"
 
@@ -31,20 +31,17 @@ public:
 
     // Tells the resource to destroy itself, removes from tracking
     void releaseResource(const TFrail<SVRIResource>& inResource) {
-        if (m_Destroyed) return; // The allocator, upon destruction, automatically destroys all assets
-        if (m_Resources.contains(inResource.get())) {
-            const auto index = m_Resources.find(inResource.get());
-            m_DeletionQueue.get(CVRI::get()->getSwapchain()->m_Buffering.getFrameIndex()).push(m_Resources.get(index)->getDestroyer());
-            m_Resources.pop(index);
+        assert(m_Resources.contains(inResource));
+        if (const auto& destroyer = inResource->getDestroyer()) {
+            m_DeletionQueue.get(CVRI::get()->getSwapchain()->m_Buffering.getFrameIndex()).push(destroyer);
         }
+        m_Resources.pop(inResource);
     }
 
     void immediateRelease(const TFrail<SVRIResource>& inResource) {
-        if (m_Destroyed) return; // The allocator, upon destruction, automatically destroys all assets
-        if (m_Resources.contains(inResource.get())) {
-            m_Resources.pop(inResource);
-            inResource->getDestroyer()();
-        }
+        assert(m_Resources.contains(inResource));
+        m_Resources.pop(inResource);
+        inResource->getDestroyer()();
     }
 
     void popDeferredQueue(const size_t inFrameIndex) {
@@ -54,9 +51,7 @@ public:
         m_DeletionQueue.get(inFrameIndex).clear();
     }
 
-private:
-
-    bool m_Destroyed = false;
+public:
 
     VmaAllocator_T* m_Allocator = nullptr;
 

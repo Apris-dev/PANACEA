@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sstl/Memory.h"
+#include "sptr/Memory.h"
 
 /*
  * A simple base class for all objects

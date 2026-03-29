@@ -43,7 +43,8 @@ public:
 	template <typename TPass>
 	void addPass() {
 		if (hasPass<TPass>()) return;
-		m_Passes.push_back(TUnique<TPass>{this});
+		m_Passes.push_back(TUnique<TPass>{});
+		m_Passes.back()->init(this);
 	}
 
 	template <typename... TPasses>

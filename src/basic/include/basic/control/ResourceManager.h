@@ -5,7 +5,7 @@
 #include "basic/core/Common.h"
 #include "basic/core/Object.h"
 #include "sstl/List.h"
-#include "sstl/Memory.h"
+#include "sptr/Memory.h"
 
 /*
  * Stores pointers to CObject so they can be automatically deallocated when flush is called

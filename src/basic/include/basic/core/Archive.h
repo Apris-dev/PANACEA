@@ -13,7 +13,7 @@
 #include "Class.h"
 #include "Object.h"
 #include "sstl/Container.h"
-#include "sstl/Memory.h"
+#include "sptr/Memory.h"
 #include "sstl/Vector.h"
 
 class CArchive;

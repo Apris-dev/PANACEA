@@ -121,7 +121,7 @@ struct SVRIResource {
 	SVRIResource(const SVRIResource&) = delete;
 	SVRIResource& operator=(const SVRIResource&) = delete;
 
-	virtual std::function<void()> getDestroyer() = 0;
+	virtual std::function<void()> getDestroyer() { return {}; }
 
 	EXPORT void release();
 };
@@ -129,9 +129,6 @@ struct SVRIResource {
 // Create wrappers around Vulkan types that can be destroyed
 #define CREATE_VK_TYPE(n) \
 	struct C##n : SVRIResource { \
-		C##n() = default; \
-		C##n(Vk##n inType): m##n(inType) {} \
-		C##n(const C##n& in##n): m##n(in##n.m##n) {} \
 		C##n(Vk##n##CreateInfo inCreateInfo) { \
 			VK_CHECK(vkCreate##n(CVRI::get()->getDevice()->device, &inCreateInfo, nullptr, &m##n)); \
 		} \
@@ -151,7 +148,6 @@ CREATE_VK_TYPE(PipelineLayout);
 //TODO: rename
 struct SPipeline : SVRIResource {
 
-	SPipeline() = default;
 	EXPORT SPipeline(const SPipelineCreateInfo& inCreateInfo, CVertexAttributeArchive& inAttributes, const TUnique<CPipelineLayout>& inLayout);
 
 	EXPORT void bind(VkCommandBuffer cmd, const VkPipelineBindPoint inBindPoint) const;
@@ -176,17 +172,9 @@ CREATE_VK_TYPE(ShaderModule); //TODO: remove
 
 struct CDescriptorSet : SVRIResource {
 
-	CDescriptorSet() = default;
-
-	CDescriptorSet(const VkDescriptorSet inType): mDescriptorSet(inType) {}
-
-	CDescriptorSet(const CDescriptorSet& inDescriptorSet): mDescriptorSet(inDescriptorSet.mDescriptorSet) {}
-
 	CDescriptorSet(const VkDescriptorSetAllocateInfo& inCreateInfo) {
 		VK_CHECK(vkAllocateDescriptorSets(CVRI::get()->getDevice()->device, &inCreateInfo, &mDescriptorSet));
 	}
-
-	virtual std::function<void()> getDestroyer() override { return []{}; }
 
 	void bind(VkCommandBuffer cmd, VkPipelineBindPoint inBindPoint, VkPipelineLayout inPipelineLayout, uint32 inFirstSet, uint32 inDescriptorSetCount) const {
 		vkCmdBindDescriptorSets(cmd, inBindPoint,inPipelineLayout, inFirstSet, inDescriptorSetCount, &mDescriptorSet, 0, nullptr);
@@ -200,7 +188,6 @@ struct CDescriptorSet : SVRIResource {
 
 struct SShader : SVRIResource {
 
-	SShader() = default;
 	EXPORT SShader(const char* inFilePath);
 
 	EXPORT virtual std::function<void()> getDestroyer() override;
@@ -321,7 +308,6 @@ struct SVRIMeshBuffer {
 
 struct SVRIImage : SVRIResource {
 
-	SVRIImage() = default;
 	EXPORT SVRIImage(const std::string& inDebugName, VkExtent3D inExtent, VkFormat inFormat, VkImageUsageFlags inFlags = 0, VkImageAspectFlags inViewFlags = 0, uint32 inNumMips = 1);
 
 	EXPORT virtual std::function<void()> getDestroyer() override;

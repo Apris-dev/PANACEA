@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "basic/core/Common.h"
-#include "sstl/Memory.h"
+#include "sptr/Memory.h"
 #include "sstl/PriorityMap.h"
 
 namespace vkb {
@@ -26,6 +26,8 @@ struct VmaAllocator_T;
 struct VkSurfaceKHR_T;
 class CVRIAllocator;
 class CVRISwapchain;
+
+EXPORT extern bool gIsVRIInitialized;
 
 // A class defining the interface vulkan uses for all of its calls and resource management
 class CVRI {

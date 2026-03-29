@@ -254,7 +254,7 @@ void CVulkanRenderer::render(SRendererInfo& info) {
 			// Tell all renderers that rendering has begun
 
 			CObjectRendererRegistry::get()->getObjects().forEach([](const TPair<std::string, const TUnique<CObjectRenderer>&>& pair) {
-				pair.obj()->begin();
+				pair.second->begin();
 			});
 
 			cmd->setViewportScissor(info.viewport->mExtent);
@@ -283,7 +283,7 @@ void CVulkanRenderer::render(SRendererInfo& info) {
 
 			// Tell all renderers that rendering has ended
 			CObjectRendererRegistry::get()->getObjects().forEach([](const TPair<std::string, const TUnique<CObjectRenderer>&>& pair) {
-				pair.obj()->end();
+				pair.second->end();
 			});
 
 			// Tell all passes that rendering has begun
@@ -299,15 +299,15 @@ void CVulkanRenderer::render(SRendererInfo& info) {
 		cmd->transitionImage(mEngineTextures->mDrawImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
 		// Make the swapchain image into presentable mode
-		cmd->transitionImage(swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		cmd->transitionSwapchainImage(swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 		// Execute a copy from the draw image into the swapchain
 		auto [width, height, depth] = mEngineTextures->mDrawImage->getExtent();
 		auto [dstWidth, dstHeight] = CVRI::get()->getSwapchain()->mSwapchain->mInternalSwapchain->extent;
-		cmd->blitImage(mEngineTextures->mDrawImage, swapchainImage, {width, height}, {dstWidth, dstHeight});
+		cmd->blitToSwapchain(mEngineTextures->mDrawImage, swapchainImage, {width, height}, {dstWidth, dstHeight});
 
 		// Set swapchain image layout to Present so we can show it on the screen
-		cmd->transitionImage(swapchainImage, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+		cmd->transitionSwapchainImage(swapchainImage, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 		//finalize the command buffer (we can no longer add commands, but it can now be executed)
 		cmd->end();

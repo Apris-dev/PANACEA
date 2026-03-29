@@ -4,7 +4,7 @@
 
 #include "Renderer.h"
 #include "basic/core/Threading.h"
-#include "sstl/Memory.h"
+#include "sptr/Memory.h"
 #include "sstl/Vector.h"
 
 #include "tracy/Tracy.hpp"

@@ -54,8 +54,16 @@ using CSingleBuffering = TBuffering<1>;
 
 using CDoubleBuffering = TBuffering<2>;
 
-struct SSwapchainImage : SVRIImage {
+struct SSwapchainImage : SVRIResource {
+
+    SSwapchainImage() = default;
     EXPORT virtual std::function<void()> getDestroyer() override;
+
+    VkImage mImage = nullptr;
+    VkImageView mImageView = nullptr;
+    uint32 mBindlessAddress = -1;
+
+	VkImageLayout mLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 };
 
 struct SSwapchain final : TInitializable<const vkb::Result<vkb::Swapchain>&>, IDestroyable {

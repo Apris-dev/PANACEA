@@ -49,7 +49,7 @@ public:
 	}
 
 	// The extent of the window
-	Extent32u mExtent = {1920, 1080};
+	Extent32u mExtent = {854, 480};
 
 	// The SDL window
 	struct SDL_Window* mWindow = nullptr;

@@ -168,7 +168,7 @@ void CEditorRenderer::init() {
 		//CMeshPass,
 		//CSpritePass,
 		//CEditorSpritePass,
-		//CEngineUIPass
+		CEngineUIPass
 	>();
 
 	if (CSpritePass* pass = getPass<CSpritePass>()) {

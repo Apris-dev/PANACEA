@@ -1,6 +1,3 @@
-[submodule "third_party/vk-bootstrap"]
-	path = third_party/vk-bootstrap
-	url = https://github.com/charles-lunarg/vk-bootstrap
 [submodule "third_party/sdl"]
 	path = third_party/sdl
 	url = https://github.com/libsdl-org/SDL
@@ -25,6 +22,10 @@
 [submodule "third_party/freetype"]
 	path = third_party/freetype
 	url = https://github.com/freetype/freetype
-[submodule "third_party/simplestl"]
-	path = third_party/simplestl
-	url = https://github.com/StrideStudios/SimpleSTL
+[submodule "vk-bootstrap"]
+	path = third_party/vk-bootstrap
+	url = https://github.com/th3or14/vk-bootstrap.git
+	branch = lifetime
+[submodule "third_party/simplecpp"]
+	path = third_party/simplecpp
+	url = https://github.com/StrideStudios/SimpleCPP.git

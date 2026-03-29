@@ -5,6 +5,8 @@
 #include "VRIResources.h"
 #include "sstl/ForwardList.h"
 
+struct SSwapchainImage;
+
 // Commands used to interact with the vulkan driver
 // TODO: separate thread?
 class CVRICommands {
@@ -96,7 +98,9 @@ public:
      */
 
     EXPORT void blitImage(const TFrail<SVRIImage>& inSource, const TFrail<SVRIImage>& inDestination, Extent32u inSrcSize, Extent32u inDstSize) const;
+    EXPORT void blitToSwapchain(const TFrail<SVRIImage>& inSource, const TFrail<SSwapchainImage>& inDestination, Extent32u inSrcSize, Extent32u inDstSize) const;
     EXPORT void transitionImage(const TFrail<SVRIImage>& inImage, VkImageLayout inLayout);
+    EXPORT void transitionSwapchainImage(const TFrail<SSwapchainImage>& inImage, VkImageLayout inLayout);
 	EXPORT void clearImage(const TFrail<SVRIImage>& inImage) const;
 	EXPORT void copyBufferToImage(const TFrail<SVRIBuffer>& inBuffer, const TFrail<SVRIImage>& inImage,  VkImageLayout dstImageLayout,
 	uint32_t regionCount,
@@ -120,4 +124,5 @@ public:
 
 	VkCommandBuffer cmd = nullptr;
 	TForwardList<TFrail<SVRIImage>> imageTransitions;
+	TForwardList<TFrail<SSwapchainImage>> swapchainTransitions;
 };

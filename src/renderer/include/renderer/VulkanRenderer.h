@@ -4,9 +4,10 @@
 #include <functional>
 #include <memory>
 
+#include "basic/core/Class.h"
 #include "rendercore/Renderer.h"
 #include "rendercore/VulkanResources.h"
-#include "sstl/Threading.h"
+#include "sutil/Threading.h"
 #include "VRI/VRISwapchain.h"
 
 class CVRICommands;
