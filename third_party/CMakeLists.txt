@@ -1,7 +1,7 @@
-﻿option(SIMPLESTL_INIT "" ON)
-option(SIMPLESTL_DESTROY "" ON)
-option(SIMPLESTL_RELEASE "" ON)
-add_subdirectory(simplestl)
+﻿option(SIMPLEPTR_INIT "" ON)
+option(SIMPLEPTR_DESTROY "" ON)
+option(SIMPLEPTR_RELEASE "" ON)
+add_subdirectory(simplecpp)
 
 add_subdirectory(glm)
 add_subdirectory(fmt)

@@ -7,7 +7,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 # Project Definition
 
 project(
-    StrideEngine
+    PANACEA
     VERSION 1.0.0
     LANGUAGES CXX C
 )

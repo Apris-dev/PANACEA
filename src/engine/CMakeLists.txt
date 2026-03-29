@@ -1,12 +1,12 @@
-﻿create_module(StrideEngine-engine SHARED)
+﻿create_module(PANACEA-engine SHARED)
 
-add_dependencies(StrideEngine-engine
+add_dependencies(PANACEA-engine
     PRIVATE
         SDL3::SDL3
 
-        StrideEngine-rendercore
-        StrideEngine-imgui
+        PANACEA-rendercore
+        PANACEA-imgui
     PUBLIC
-        StrideEngine-basic
-        StrideEngine-VRI
+        PANACEA-basic
+        PANACEA-VRI
 )

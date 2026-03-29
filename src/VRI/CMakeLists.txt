@@ -1,7 +1,7 @@
-﻿create_module(StrideEngine-VRI SHARED)
+﻿create_module(PANACEA-VRI SHARED)
 
 find_package(Vulkan REQUIRED COMPONENTS dxc)
-add_dependencies(StrideEngine-VRI
+add_dependencies(PANACEA-VRI
     PRIVATE
         SDL3::SDL3
         vk-bootstrap::vk-bootstrap
@@ -10,5 +10,5 @@ add_dependencies(StrideEngine-VRI
 
     PUBLIC
 
-        StrideEngine-basic
+        PANACEA-basic
 )

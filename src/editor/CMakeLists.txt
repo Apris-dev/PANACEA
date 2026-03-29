@@ -1,8 +1,8 @@
-﻿create_module(StrideEngine-editor SHARED)
+﻿create_module(PANACEA-editor SHARED)
 
-add_dependencies(StrideEngine-editor
+add_dependencies(PANACEA-editor
     PUBLIC
-        StrideEngine-basic
-        StrideEngine-rendercore
-        StrideEngine-renderer
+        PANACEA-basic
+        PANACEA-rendercore
+        PANACEA-renderer
 )

@@ -1,19 +1,19 @@
-﻿create_module(StrideEngine-renderer SHARED)
+﻿create_module(PANACEA-renderer SHARED)
 
-add_dependencies(StrideEngine-renderer
+add_dependencies(PANACEA-renderer
     PRIVATE
         vk-bootstrap::vk-bootstrap
         SDL3::SDL3
 
-        StrideEngine-imgui
+        PANACEA-imgui
     PUBLIC
-        StrideEngine-basic
-        StrideEngine-rendercore
-        #StrideEngine-VRI
-        StrideEngine-engine
+        PANACEA-basic
+        PANACEA-rendercore
+        #PANACEA-VRI
+        PANACEA-engine
 )
 
 # Basis universal doesn't include itself by default
-target_include_directories(StrideEngine-renderer PUBLIC
+target_include_directories(PANACEA-renderer PUBLIC
         "../../third_party/basis_universal"
 )

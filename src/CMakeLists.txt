@@ -85,7 +85,7 @@ endfunction()
 function(subdirectory_link TARGET_NAME TYPE)
     foreach(arg IN LISTS ARGN)
         add_subdirectory(${arg})
-        target_link_libraries(${TARGET_NAME} ${TYPE} "StrideEngine-${arg}")
+        target_link_libraries(${TARGET_NAME} ${TYPE} "PANACEA-${arg}")
     endforeach()
 endfunction()
 
@@ -115,9 +115,9 @@ add_to_sources(
         editor
 )
 
-add_executable(StrideEngine Application.cpp Sources.h)
+add_executable(PANACEA Application.cpp Sources.h)
 
-subdirectory_link(StrideEngine PUBLIC
+subdirectory_link(PANACEA PUBLIC
         basic
         imgui
         VRI
@@ -128,20 +128,20 @@ subdirectory_link(StrideEngine PUBLIC
 )
 
 if(WIN32)
-    set_target_properties(StrideEngine
+    set_target_properties(PANACEA
             PROPERTIES
             LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE"
             LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
     )
 
-    target_compile_definitions(StrideEngine PRIVATE
+    target_compile_definitions(PANACEA PRIVATE
             $<$<CONFIG:Debug>:BUILD_DEBUG>
             $<$<CONFIG:Release>:BUILD_RELEASE>
     )
 
     # Tell cmake to copy dlls to the target directory
-    add_custom_command(TARGET StrideEngine POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:StrideEngine> $<TARGET_FILE_DIR:StrideEngine>
+    add_custom_command(TARGET PANACEA POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:PANACEA> $<TARGET_FILE_DIR:PANACEA>
             COMMAND_EXPAND_LISTS
     )
 endif()

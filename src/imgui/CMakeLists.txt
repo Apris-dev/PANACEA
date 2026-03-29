@@ -1,8 +1,8 @@
-﻿create_module(StrideEngine-imgui SHARED)
-target_include_directories(StrideEngine-imgui PUBLIC "include/imgui")
+﻿create_module(PANACEA-imgui SHARED)
+target_include_directories(PANACEA-imgui PUBLIC "include/imgui")
 
 find_package(Vulkan REQUIRED)
-add_dependencies(StrideEngine-imgui
+add_dependencies(PANACEA-imgui
     PRIVATE
         SDL3::SDL3
         Vulkan::Vulkan

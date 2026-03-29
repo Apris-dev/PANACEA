@@ -1,8 +1,9 @@
-﻿create_precompiled_module(StrideEngine-basic SHARED)
+﻿create_precompiled_module(PANACEA-basic SHARED)
 
-add_dependencies(StrideEngine-basic
+add_dependencies(PANACEA-basic
     PUBLIC
-        SimpleSTL
+        SimpleCPP-SimplePtr
+        SimpleCPP-SimpleSTL
         glm::glm-header-only
         fmt::fmt
         Tracy::TracyClient

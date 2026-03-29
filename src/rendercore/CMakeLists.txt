@@ -1,7 +1,7 @@
-﻿create_module(StrideEngine-rendercore SHARED)
+﻿create_module(PANACEA-rendercore SHARED)
 
 find_package(Vulkan REQUIRED)
-add_dependencies(StrideEngine-rendercore
+add_dependencies(PANACEA-rendercore
     PRIVATE
         SDL3::SDL3
         fastgltf::fastgltf
@@ -12,11 +12,11 @@ add_dependencies(StrideEngine-rendercore
         vk-bootstrap::vk-bootstrap
         Vulkan::Vulkan
 
-        StrideEngine-basic
-        StrideEngine-VRI
+        PANACEA-basic
+        PANACEA-VRI
 )
 
 # Basis universal doesn't include itself by default
-target_include_directories(StrideEngine-rendercore PUBLIC
+target_include_directories(PANACEA-rendercore PUBLIC
         "../../third_party/basis_universal"
 )

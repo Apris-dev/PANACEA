@@ -281,7 +281,7 @@ private:
 #define text(x) x
 typedef const char* SChar;
 
-constexpr static auto gEngineName = text("Stride Engine");
+constexpr static auto gEngineName = text("PANACEA");
 
 // Gives the enum some convenience operators
 #define ENUM_OPERATORS(EnumName, inType) \
