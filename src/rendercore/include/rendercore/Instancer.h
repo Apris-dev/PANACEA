@@ -4,17 +4,17 @@
 
 #include "rendercore/RenderStack.h"
 #include "rendercore/VulkanResources.h"
-#include "basic/core/Archive.h"
+#include "sarch/Archive.h"
 
 struct SInstance {
 	Matrix4f Transform{1.f};
 
-	friend CArchive& operator<<(CArchive& inArchive, const SInstance& inInstance) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const SInstance& inInstance) {
 		inArchive << inInstance.Transform;
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, SInstance& inInstance) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, SInstance& inInstance) {
 		inArchive >> inInstance.Transform;
 		return inArchive;
 	}
@@ -156,18 +156,18 @@ struct SDynamicInstancer : IInstancer {
 	}
 
 	virtual size_t getNumberOfInstances() override {
-		return m_Instances.size();
+		return m_Instances.getSize();
 	}
 
 	void reallocate(SRenderStack& stack) {
 
-		for (auto& instance : m_Instances) {
+		m_Instances.forEach([&](size_t, SInstance& instance) {
 			stack.push(instance.Transform);
 			instance.Transform = stack.get();
 			stack.pop();
-		}
+		});
 
-		const size_t bufferSize = m_Instances.size() * sizeof(SInstance);
+		const size_t bufferSize = m_Instances.getSize() * sizeof(SInstance);
 
 		m_InstanceBuffer.push( m_Instances.data(), bufferSize);
 	}
@@ -187,34 +187,34 @@ struct SDynamicInstancer : IInstancer {
 	}
 
 	size_t addInstance(const SInstance& inInstance) {
-		m_Instances.push_back(inInstance);
-		return m_Instances.size() - 1;
+		m_Instances.push(inInstance);
+		return m_Instances.getSize() - 1;
 	}
 
 	void removeInstance(const size_t index) {
-		m_Instances.erase(m_Instances.begin() + index);
+		m_Instances.popAt(index);
 	}
 
 	SInstance& getInstance(const size_t index = 0) {
-		if (index >= m_Instances.size()) {
-			errs("Invalid Instance Index {} in dynamic instancer of size {}!", index, m_Instances.size());
+		if (index >= m_Instances.getSize()) {
+			errs("Invalid Instance Index {} in dynamic instancer of size {}!", index, m_Instances.getSize());
 		}
 		return m_Instances[index];
 	}
 
-	friend CArchive& operator<<(CArchive& inArchive, const SDynamicInstancer& inInstancer) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const SDynamicInstancer& inInstancer) {
 		inArchive << inInstancer.m_Instances;
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, SDynamicInstancer& inInstancer) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, SDynamicInstancer& inInstancer) {
 		inArchive >> inInstancer.m_Instances;
 		return inArchive;
 	}
 
 private:
 
-	std::vector<SInstance> m_Instances;
+	TVector<SInstance> m_Instances;
 
 	SDynamicBuffer<VMA_MEMORY_USAGE_GPU_ONLY, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT> m_InstanceBuffer{"Dynamic Instance Buffer"};
 

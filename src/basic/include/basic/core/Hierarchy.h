@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sarch/Archive.h"
 #include "sstl/List.h"
 
 template <typename TType>

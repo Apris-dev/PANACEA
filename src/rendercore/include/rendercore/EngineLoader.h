@@ -80,18 +80,18 @@ struct SMeshData {
 	};
 
 	bool mHasVertexColor = false;
-	std::vector<uint32> indices{};
-	std::vector<SVertex> vertices{};
-	std::vector<Surface> surfaces{};
+	TVector<uint32> indices{};
+	TVector<SVertex> vertices{};
+	TVector<Surface> surfaces{};
 	SBounds bounds{};
 
-	friend CArchive& operator<<(CArchive& inArchive, const SMeshData& inData) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const SMeshData& inData) {
 		inArchive << inData.mHasVertexColor;
 
-		std::vector<uint8> indices0;
-		std::vector<uint16> indices1;
-		std::vector<storedIndex> indices2;
-		std::vector<uint32> indices3;
+		TVector<uint8> indices0;
+		TVector<uint16> indices1;
+		TVector<storedIndex> indices2;
+		TVector<uint32> indices3;
 
 		// Smart index pushing to remove spaces inbetween indices
 		for (auto index : inData.indices) {
@@ -133,7 +133,7 @@ struct SMeshData {
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, SMeshData& inData) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, SMeshData& inData) {
 		inArchive >> inData.mHasVertexColor;
 
 		std::vector<uint8> indices0;

@@ -4,6 +4,7 @@
 #include "fmt/format.h"
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include "sarch/Archive.h"
 
 //TODO: why this?
 #define GLM_ENABLE_EXPERIMENTAL
@@ -154,6 +155,46 @@ struct half {
 
 #define PI 3.14159265359
 #define DOUBLE_PI 6.28318530718
+
+//
+// Math
+//
+
+template <glm::length_t TSize, typename TType>
+COutputArchive& operator<<(COutputArchive& inArchive, const glm::vec<TSize, TType>& inVector) {
+	for (glm::length_t i = 0; i < TSize; ++i) {
+		inArchive << inVector[i];
+	}
+	return inArchive;
+}
+
+template <glm::length_t TSize, typename TType>
+CInputArchive& operator>>(CInputArchive& inArchive, glm::vec<TSize, TType>& inVector) {
+	for (glm::length_t i = 0; i < TSize; ++i) {
+		inArchive >> inVector[i];
+	}
+	return inArchive;
+}
+
+template <glm::length_t TCSize, glm::length_t TRSize, typename TType>
+COutputArchive& operator<<(COutputArchive& inArchive, const glm::mat<TCSize, TRSize, TType>& inMatrix) {
+	for (glm::length_t c = 0; c < TCSize; ++c) {
+		for (glm::length_t r = 0; r < TRSize; ++r) {
+			inArchive << inMatrix[c][r];
+		}
+	}
+	return inArchive;
+}
+
+template <glm::length_t TCSize, glm::length_t TRSize, typename TType>
+CInputArchive& operator>>(CInputArchive& inArchive, glm::mat<TCSize, TRSize, TType>& inMatrix) {
+	for (glm::length_t c = 0; c < TCSize; ++c) {
+		for (glm::length_t r = 0; r < TRSize; ++r) {
+			inArchive >> inMatrix[c][r];
+		}
+	}
+	return inArchive;
+}
 
 // Extent should always be used with integer types
 

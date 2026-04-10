@@ -2,8 +2,7 @@
 
 add_dependencies(PANACEA-basic
     PUBLIC
-        SimpleCPP-SimplePtr
-        SimpleCPP-SimpleSTL
+        SimpleCPP
         glm::glm-header-only
         fmt::fmt
         Tracy::TracyClient

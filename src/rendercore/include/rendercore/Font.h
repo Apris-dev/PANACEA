@@ -9,14 +9,14 @@ struct SFont {
 		Extent32 mBearing;
 		int64 mAdvance = 0;
 
-		friend CArchive& operator<<(CArchive& inArchive, const Letter& inLetter) {
+		friend COutputArchive& operator<<(COutputArchive& inArchive, const Letter& inLetter) {
 			inArchive << inLetter.mUV0 << inLetter.mUV1;
 			inArchive << inLetter.mBearing;
 			inArchive << inLetter.mAdvance;
 			return inArchive;
 		}
 
-		friend CArchive& operator>>(CArchive& inArchive, Letter& inLetter) {
+		friend CInputArchive& operator>>(CInputArchive& inArchive, Letter& inLetter) {
 			inArchive >> inLetter.mUV0 >> inLetter.mUV1;
 			inArchive >> inLetter.mBearing;
 			inArchive >> inLetter.mAdvance;
@@ -28,7 +28,7 @@ struct SFont {
 
 	std::string mName;
 
-	std::unordered_map<uint8, Letter> letters;
+	TMap<uint8, Letter> letters;
 
 	TUnique<SVRIImage> mAtlasImage = nullptr;
 
@@ -38,7 +38,7 @@ struct SFont {
 	float mAscenderPx = 0.f;
 	float mDescenderPx = 0.f;
 
-	friend CArchive& operator<<(CArchive& inArchive, const SFont& inFont) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const SFont& inFont) {
 		inArchive << inFont.mName;
 		inArchive << inFont.mAtlasSize;
 		inArchive << inFont.mSize;
@@ -49,7 +49,7 @@ struct SFont {
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, SFont& inFont) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, SFont& inFont) {
 		inArchive >> inFont.mName;
 		inArchive >> inFont.mAtlasSize;
 		inArchive >> inFont.mSize;
