@@ -129,7 +129,7 @@ bool isVisible(const Matrix4f& inViewProj, const Matrix4f& inTransformMatrix, co
 }
 
 void renderChild(const SRendererInfo& info, CMeshPass* pass, const TFrail<CVRICommands>& cmd, SRenderStack3f& stack, THierarchy<CWorldObject>* inHierarchy, size_t& meshCount, size_t& drawCallCount, size_t& vertexCount) {
-	inHierarchy->getChildren().forEach([&](size_t index, TUnique<CWorldObject>& obj) {
+	for (auto& obj : inHierarchy->getChildren()) {
 		stack.push(obj->getTransformMatrix());
 
 		if (const auto staticMesh = dynamic_cast<CStaticMeshObject*>(obj.get())) {
@@ -145,7 +145,7 @@ void renderChild(const SRendererInfo& info, CMeshPass* pass, const TFrail<CVRICo
 		renderChild(info, pass, cmd, stack, obj.get(), meshCount, drawCallCount, vertexCount);
 
 		stack.pop();
-	});
+	}
 }
 
 void CMeshPass::render(const SRendererInfo& info, const TFrail<CVRICommands>& cmd) {

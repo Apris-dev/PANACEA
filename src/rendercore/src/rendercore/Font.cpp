@@ -16,7 +16,7 @@ void SFont::forEachLetter(const std::string& text, std::function<void(const Vect
 			continue;
 		}
 
-		const auto& glyph = letters.contains(cp) ? letters.at(cp) : letters.at('?');
+		const auto& glyph = letters.isValid(cp) ? letters.get(cp) : letters.get('?');
 		const auto& uv0 = glyph.mUV0;
 		const auto& uv1 = glyph.mUV1;
 

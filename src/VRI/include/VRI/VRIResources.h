@@ -68,10 +68,10 @@ public:
 
 		uint32 location = 0;
 		uint32 binding = 0;
-		m_Formats.forEach([&](size_t, const VertexAttributeFormat& formats) {
+		for (auto& [inputRate, formats] : m_Formats) {
 			uint32 stride = 0;
-			for (uint32 current = 0; current < formats.formats.getSize(); ++current, ++location) {
-				const auto& format = formats.formats[current];
+			for (uint32 current = 0; current < formats.getSize(); ++current, ++location) {
+				const auto& format = formats[current];
 				m_Attributes.push(VkVertexInputAttributeDescription{
 					location,
 					binding,
@@ -83,10 +83,10 @@ public:
 			m_Bindings.push({
 				.binding = binding,
 				.stride = stride,
-				.inputRate = formats.inputRate
+				.inputRate = inputRate
 			});
 			binding++;
-		});
+		}
 
 		return
 		{

@@ -150,7 +150,7 @@ struct TClass<TCurrentClass, TParentClasses...> : TGenericClass<TCurrentClass, T
 
 template <typename TClassType>
 TClassType* makeClass(const std::string& inName) {
-	if (!SClassRegistry::get()->getObjects().contains(inName)) {
+	if (!SClassRegistry::get()->getObjects().isValid(inName)) {
 		SClassRegistry::get()->getObjects().push(inName, TUnique<TClassType>{inName});
 	}
 	return static_cast<TClassType*>(SClassRegistry::get()->getObjects().get(inName).get());

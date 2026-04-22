@@ -58,13 +58,13 @@ public:
 		m_Instancer.removeInstance(instance);
 	}
 
-	virtual CArchive& save(CArchive& inArchive) const override {
+	virtual COutputArchive& save(COutputArchive& inArchive) const override {
 		CViewportObject::save(inArchive);
 		inArchive << m_Instancer;
 		return inArchive;
 	}
 
-	virtual CArchive& load(CArchive& inArchive) override {
+	virtual CInputArchive& load(CInputArchive& inArchive) override {
 		CViewportObject::load(inArchive);
 		inArchive >> m_Instancer;
 		return inArchive;

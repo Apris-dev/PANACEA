@@ -37,13 +37,13 @@ void CVRICommands::end() {
 
 	// TODO: move various cleanup actions to before swapchain wait
 	// Image transitions can no longer occur
-	imageTransitions.forEach([](size_t, const TFrail<SVRIImage>& image) {
+	for (const TFrail<SVRIImage>& image : imageTransitions) {
 		image->mLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	});
+	}
 	imageTransitions.clear();
-	swapchainTransitions.forEach([](size_t, const TFrail<SSwapchainImage>& image) {
+	for (const TFrail<SSwapchainImage>& image : swapchainTransitions) {
 		image->mLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	});
+	}
 	swapchainTransitions.clear();
 }
 

@@ -12,14 +12,14 @@ struct SBounds {
 	float sphereRadius;
 	Vector3f extents;
 
-	friend CArchive& operator<<(CArchive& inArchive, const SBounds& inBounds) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const SBounds& inBounds) {
 		inArchive << inBounds.origin;
 		inArchive << inBounds.sphereRadius;
 		inArchive << inBounds.extents;
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, SBounds& inBounds) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, SBounds& inBounds) {
 		inArchive >> inBounds.origin;
 		inArchive >> inBounds.sphereRadius;
 		inArchive >> inBounds.extents;
@@ -51,12 +51,12 @@ struct SStaticMesh : public SObject {
 		return getHash(inMesh.name);
 	}
 
-	friend CArchive& operator<<(CArchive& inArchive, const SStaticMesh& inMesh) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const SStaticMesh& inMesh) {
 		inArchive << inMesh.name;
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, SStaticMesh& inMesh) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, SStaticMesh& inMesh) {
 		inArchive >> inMesh.name;
 		return inArchive;
 	}

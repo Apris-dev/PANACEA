@@ -7,7 +7,6 @@
 #include "engine/Input.h"
 #include "scene/base/Scene.h"
 #include "rendercore/Renderer.h"
-#include "basic/core/Threading.h"
 #include "SDL3/SDL_timer.h"
 #include "tracy/Tracy.hpp"
 
@@ -93,7 +92,7 @@ void CEngine::run_internal() {
 
 		// Execute any tasks that are on the 'main thread'
 		// Done here because they can be done during the frame cap wait
-		CThreading::getMainThread().executeAll();
+		//CThreading::getMainThread().executeAll();
 
 		// If we go over the target framerate, delay
 		// Ensure no divide by 0
@@ -113,7 +112,7 @@ void CEngine::run_internal() {
 	}
 
 	// Stop 'main thread'
-	CThreading::getMainThread().stop();
+	//CThreading::getMainThread().stop();
 
 	m_Renderer.destroy();
 

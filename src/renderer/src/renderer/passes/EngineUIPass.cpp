@@ -16,7 +16,6 @@
 #include "rendercore/StaticMesh.h"
 #include "scene/world/StaticMeshObject.h"
 #include "engine/Viewport.h"
-#include "basic/core/Threading.h"
 #include "engine/Engine.h"
 #include "renderer/EngineTextures.h"
 #include "scene/viewport/generic/Text.h"
@@ -97,9 +96,9 @@ void renderFontUI(const SRendererInfo& info) {
 			//TODO: file query shouldnt be in viewport (also should be on background, but rendering thread crashes)
 			CEngineViewport::queryForFile(filters, [&](std::vector<std::string> inFiles) {
 				for (const auto& file : inFiles) {
-					CThreading::getMainThread().add([info, file] {
+					//CThreading::getMainThread().add([info, file] { //TODO: other thread
 						CEngineLoader::importFont(info.renderer, file);
-					});
+					//});
 				}
 			});
 		}
@@ -139,9 +138,9 @@ void renderTextureUI(const SRendererInfo& info) {
 			//TODO: file query shouldnt be in viewport
 			CEngineViewport::queryForFile(filters, [&](std::vector<std::string> inFiles) {
 				for (const auto& file : inFiles) {
-					CThreading::runOnBackgroundThread([info, file] {
+					//CThreading::runOnBackgroundThread([info, file] { //TODO: other thread
 						CEngineLoader::importTexture(info.renderer, file);
-					});
+					//});
 				}
 			});
 		}
@@ -224,7 +223,7 @@ void renderMaterialUI(const SRendererInfo& info) {
 				}
 
 				if (ImGui::TreeNode("Inputs")) {
-					for (uint8 i = 0; i < material->mConstants.size(); ++i) {
+					for (uint8 i = 0; i < material->mConstants.getSize(); ++i) {
 						ImGui::InputFloat4(fmts("Input {}", i).c_str(), (float*)&material->mConstants[i]);
 					}
 					ImGui::TreePop();
@@ -286,9 +285,9 @@ void renderMeshUI(const SRendererInfo& info) {
 			//TODO: file query shouldn't be in viewport
 			CEngineViewport::queryForFile(filters, [&](std::vector<std::string> inFiles) {
 				for (const auto& file : inFiles) {
-					CThreading::runOnBackgroundThread([info, file] {
+					//CThreading::runOnBackgroundThread([info, file] { //TODO: other thread
 						CEngineLoader::importMesh(info.renderer, file);
-					});
+					//});
 				}
 			});
 		}

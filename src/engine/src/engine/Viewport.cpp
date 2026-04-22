@@ -4,8 +4,6 @@
 #include "imgui/imgui_impl_sdl3.h"
 #include "engine/Input.h"
 #include "basic/core/Paths.h"
-#include "basic/core/Threading.h"
-#include "rendercore/Renderer.h"
 #include "SDL3/SDL_dialog.h"
 #include "SDL3/SDL_init.h"
 
@@ -61,7 +59,7 @@ void CEngineViewport::pollEvents(bool& outRunning, bool& outPauseRendering) {
 				outRunning = false;
 				// Stop all processes
 				//TODO: keep rendering and have icon to tell user it's stopping
-				CThreading::stop();
+				//CThreading::stop();
 			case SDL_EVENT_WINDOW_MINIMIZED:
 				outPauseRendering = true;
 				break;

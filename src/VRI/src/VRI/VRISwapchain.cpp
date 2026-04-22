@@ -51,12 +51,15 @@ void SSwapchain::init(const vkb::Result<vkb::Swapchain>& inSwapchainBuilder) {
 }
 
 void SSwapchain::destroy() {
-	mSwapchainImages.forEachReverse([](size_t, TUnique<SSwapchainImage>& object){
+	for (auto itr = mSwapchainImages.rbegin(); itr != mSwapchainImages.rend(); ++itr) {
+		TUnique<SSwapchainImage>& object = *itr;
 		object.destroy();
-	});
-	mSwapchainRenderSemaphores.forEachReverse([](size_t, TUnique<CSemaphore>& object){
+	}
+
+	for (auto itr = mSwapchainRenderSemaphores.rbegin(); itr != mSwapchainRenderSemaphores.rend(); ++itr) {
+		TUnique<CSemaphore>& object = *itr;
 		object.destroy();
-	});
+	}
 	vkb::destroy_swapchain(*mInternalSwapchain);
 }
 
@@ -80,13 +83,13 @@ CVRISwapchain::CVRISwapchain(SDL_Window* window): m_Window(window) {
 		.flags = 0
 	};
 
-	m_Frames.data().forEach([&](size_t, const TUnique<FrameData>& data) {
+	for (const auto& data : m_Frames.data()) {
 		data->mRenderFence = TUnique<CFence>{fenceCreateInfo};
 		//mPresentFence = TUnique<CFence>{fenceCreateInfo};
 
 		data->mSwapchainSemaphore = TUnique<CSemaphore>{semaphoreCreateInfo};
 		//mRenderSemaphore = TUnique<CSemaphore>{semaphoreCreateInfo};
-	});
+	}
 
 	create(VK_NULL_HANDLE);
 }
@@ -129,10 +132,10 @@ void CVRISwapchain::recreate(const bool inUseVSync) {
 
 void CVRISwapchain::destroy2() {
 	if (mSwapchain) mSwapchain.destroy();
-	m_Frames.data().forEach([](size_t, const TUnique<FrameData>& data) {
+	for (const auto& data : m_Frames.data()) {
 		data->mSwapchainSemaphore.destroy();
 		data->mRenderFence.destroy();
-	});
+	}
 }
 
 TUnique<SSwapchainImage>& CVRISwapchain::getSwapchainImage() {

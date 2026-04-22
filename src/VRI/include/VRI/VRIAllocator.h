@@ -45,9 +45,9 @@ public:
     }
 
     void popDeferredQueue(const size_t inFrameIndex) {
-        m_DeletionQueue.get(inFrameIndex).forEach([](size_t, const std::function<void()>& inDestroyer) {
+        for (const auto& inDestroyer : m_DeletionQueue.get(inFrameIndex)) {
             inDestroyer();
-        });
+        }
         m_DeletionQueue.get(inFrameIndex).clear();
     }
 

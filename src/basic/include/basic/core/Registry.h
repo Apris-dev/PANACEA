@@ -8,7 +8,7 @@
 #define REGISTER_OBJ(registryType, n) \
 	private: \
 		STATIC_C_BLOCK( \
-			if (registryType::get()->getObjects().contains(#n)) return; \
+			if (registryType::get()->getObjects().isValid(#n)) return; \
 			registryType::get()->getObjects().push(#n, TUnique<n>{}); \
 		) \
 	public: \

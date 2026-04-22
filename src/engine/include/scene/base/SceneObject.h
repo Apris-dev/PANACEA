@@ -4,7 +4,7 @@
 #include "basic/core/Object.h"
 #include "basic/core/Class.h"
 
-class CSceneObject : public SObject, public ISerializable {
+class CSceneObject : public SObject {
 public:
 	REGISTER_CLASS(CSceneObject, SObject)
 
@@ -16,13 +16,23 @@ public:
 
 	no_discard virtual Matrix4f getTransformMatrix() const = 0;
 
-	virtual CArchive& save(CArchive& inArchive) const override {
+	virtual COutputArchive& save(COutputArchive& inArchive) const {
 		inArchive << mName;
 		return inArchive;
 	}
 
-	virtual CArchive& load(CArchive& inArchive) override {
+	virtual CInputArchive& load(CInputArchive& inArchive) {
 		inArchive >> mName;
+		return inArchive;
+	}
+
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const CSceneObject& inValue) {
+		inValue.save(inArchive);
+		return inArchive;
+	}
+
+	friend CInputArchive& operator>>(CInputArchive& inArchive, CSceneObject& inValue) {
+		inValue.load(inArchive);
 		return inArchive;
 	}
 
@@ -42,13 +52,25 @@ public:
 
 	no_discard EXPORT virtual Matrix4f getTransformMatrix() const override;
 
-	virtual CArchive& save(CArchive& inArchive) const override {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const CViewportObject& inValue) {
+		inValue.save(inArchive);
+		inArchive << static_cast<const THierarchy&>(inValue);
+		return inArchive;
+	}
+
+	friend CInputArchive& operator>>(CInputArchive& inArchive, CViewportObject& inValue) {
+		inValue.load(inArchive);
+		inArchive >> static_cast<THierarchy&>(inValue);
+		return inArchive;
+	}
+
+	virtual COutputArchive& save(COutputArchive& inArchive) const override {
 		CSceneObject::save(inArchive);
 		inArchive << m_Transform;
 		return inArchive;
 	}
 
-	virtual CArchive& load(CArchive& inArchive) override {
+	virtual CInputArchive& load(CInputArchive& inArchive) override {
 		CSceneObject::load(inArchive);
 		inArchive >> m_Transform;
 		return inArchive;
@@ -100,13 +122,25 @@ public:
 		return m_Transform.toMatrix();
 	}
 
-	virtual CArchive& save(CArchive& inArchive) const override {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const CWorldObject& inValue) {
+		inValue.save(inArchive);
+		inArchive << static_cast<const THierarchy&>(inValue);
+		return inArchive;
+	}
+
+	friend CInputArchive& operator>>(CInputArchive& inArchive, CWorldObject& inValue) {
+		inValue.load(inArchive);
+		inArchive >> static_cast<THierarchy&>(inValue);
+		return inArchive;
+	}
+
+	virtual COutputArchive& save(COutputArchive& inArchive) const override {
 		CSceneObject::save(inArchive);
 		inArchive << m_Transform;
 		return inArchive;
 	}
 
-	virtual CArchive& load(CArchive& inArchive) override {
+	virtual CInputArchive& load(CInputArchive& inArchive) override {
 		CSceneObject::load(inArchive);
 		inArchive >> m_Transform;
 		return inArchive;

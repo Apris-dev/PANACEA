@@ -89,11 +89,12 @@ public:
 
 	// Reverse iterate and destroy
 	virtual void flush() {
-		m_Objects.forEachReverse([](size_t index, TUnique<SObject>& obj) {
+		for (auto itr = m_Objects.rbegin(); itr != m_Objects.rend(); ++itr) {
+			TUnique<SObject>& obj = *itr;
 			if (const auto destroyable = dynamic_cast<IDestroyable*>(obj.get())) {
 				destroyable->destroy();
 			}
-		});
+		}
 		m_Objects.clear();
 	}
 

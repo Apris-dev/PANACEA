@@ -37,12 +37,12 @@ struct THierarchy {
 
 private:
 
-	friend CArchive& operator<<(CArchive& inArchive, const THierarchy& inHierarchy) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const THierarchy& inHierarchy) {
 		inArchive << inHierarchy.m_Children;
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, THierarchy& inHierarchy) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, THierarchy& inHierarchy) {
 		inArchive >> inHierarchy.m_Children;
 		return inArchive;
 	}

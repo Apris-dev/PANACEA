@@ -3,11 +3,12 @@
 #include <functional>
 
 #include "Renderer.h"
-#include "basic/core/Threading.h"
 #include "sptr/Memory.h"
 #include "sstl/Vector.h"
+#include "sutil/Threading.h"
 
 #include "tracy/Tracy.hpp"
+#include "tracy/TracyC.h"
 
 class CRenderThread : public CPersistentThread {
 
@@ -23,31 +24,35 @@ public:
     };
 
     //TODO: fill ctx
-    CRenderThread(): CPersistentThread([this] {
-        TracyCSetThreadName("Render Thread")
-        Context ctx;
-        while (true) {
-            TracyCZoneNC(zone, "Render Thread", 0xff0000, 1);
-            {
-                ZoneScopedN("Render");
-                ctx.renderer->render(ctx);
-            }
-            {
-                ZoneScopedN("Commands");
-                while (mRendererTaskQueue.getSize() > 0) {
-                    mRendererTaskQueue.top()(ctx);
-                    mRendererTaskQueue.pop();
+    CRenderThread(): CPersistentThread(m_Worker) {
+        m_Worker.add([&] {
+            TracyCSetThreadName("Render Thread")
+            Context ctx;
+            while (true) {
+                TracyCZoneNC(zone, "Render Thread", 0xff0000, 1);
+                {
+                    ZoneScopedN("Render");
+                    ctx.renderer->render(ctx);
                 }
+                {
+                    ZoneScopedN("Commands");
+                    while (!mRendererTaskQueue.isEmpty()) {
+                        mRendererTaskQueue.top()(ctx);
+                        mRendererTaskQueue.pop();
+                    }
+                }
+                TracyCZoneEnd(zone);
             }
-            TracyCZoneEnd(zone);
-        }
-    }) {}
+        });
+    }
 
     void enqueue(const std::function<void(Context&)>& func) {
         mRendererTaskQueue.push(func);
     }
 
 private:
+
+    CWorker m_Worker;
 
     TVector<std::function<void(Context&)>> mRendererTaskQueue;
 };

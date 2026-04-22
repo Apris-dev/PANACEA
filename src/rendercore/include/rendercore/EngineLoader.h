@@ -7,6 +7,7 @@
 #include "Font.h"
 #include "basic/core/Paths.h"
 #include "rendercore/StaticMesh.h"
+#include "sarch/FileArchive.h"
 
 struct SStaticMesh;
 class CMaterial;
@@ -31,7 +32,7 @@ struct SVertex {
 			((inColor.w & 0xff) << 24);
 	}
 
-	friend CArchive& operator<<(CArchive& inArchive, const SVertex& inVertex) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const SVertex& inVertex) {
 		inArchive << inVertex.position;
 		inArchive << inVertex.uv;
 		inArchive << inVertex.normal;
@@ -39,7 +40,7 @@ struct SVertex {
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, SVertex& inVertex) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, SVertex& inVertex) {
 		inArchive >> inVertex.position;
 		inArchive >> inVertex.uv;
 		inArchive >> inVertex.normal;
@@ -59,14 +60,14 @@ struct SMeshData {
 		uint32 startIndex = 0;
 		uint32 count = 0;
 
-		friend CArchive& operator<<(CArchive& inArchive, const Surface& inSurface) {
+		friend COutputArchive& operator<<(COutputArchive& inArchive, const Surface& inSurface) {
 			inArchive << inSurface.name;
 			inArchive << inSurface.startIndex;
 			inArchive << inSurface.count;
 			return inArchive;
 		}
 
-		friend CArchive& operator>>(CArchive& inArchive, Surface& inSurface) {
+		friend CInputArchive& operator>>(CInputArchive& inArchive, Surface& inSurface) {
 			inArchive >> inSurface.name;
 			inArchive >> inSurface.startIndex;
 			inArchive >> inSurface.count;
@@ -77,6 +78,16 @@ struct SMeshData {
 	// We are storing indices as an 'uint24' to reduce storage size
 	struct storedIndex {
 		uint8 i1, i2, i3;
+
+		friend COutputArchive& operator<<(COutputArchive& inArchive, const storedIndex& inObject) {
+			inArchive << inObject.i1 << inObject.i2 << inObject.i3;
+			return inArchive;
+		}
+
+		friend CInputArchive& operator>>(CInputArchive& inArchive, storedIndex& inObject) {
+			inArchive >> inObject.i1 >> inObject.i2 >> inObject.i3;
+			return inArchive;
+		}
 	};
 
 	bool mHasVertexColor = false;
@@ -95,29 +106,29 @@ struct SMeshData {
 
 		// Smart index pushing to remove spaces inbetween indices
 		for (auto index : inData.indices) {
-			if ((index & 0xff00) == 0 && indices1.empty()) {
-				indices0.push_back(index & 0xff);
+			if ((index & 0xff00) == 0 && indices1.isEmpty()) {
+				indices0.push(index & 0xff);
 				continue;
 			}
-			if ((index & 0xff0000) == 0 && indices2.empty()) {
-				indices1.push_back(index & 0xffff);
+			if ((index & 0xff0000) == 0 && indices2.isEmpty()) {
+				indices1.push(index & 0xffff);
 				continue;
 			}
-			if ((index & 0xff000000) == 0 && indices3.empty()) {
+			if ((index & 0xff000000) == 0 && indices3.isEmpty()) {
 				uint8 i1 = index & 0xff;
 				uint8 i2 = (index & 0xff00) >> 8;
 				uint8 i3 = (index & 0xff0000) >> 16;
-				indices2.push_back({i1, i2, i3});
+				indices2.push({i1, i2, i3});
 				continue;
 			}
-			indices3.push_back(index);
+			indices3.push(index);
 		}
 
 		inArchive << indices0;
 		inArchive << indices1;
 		inArchive << indices2;
 		inArchive << indices3;
-		inArchive << inData.vertices.size();
+		inArchive << inData.vertices.getSize();
 
 		// Since vertex colors are optional, they are not always serialized
 		for (const auto& value : inData.vertices) {
@@ -136,23 +147,23 @@ struct SMeshData {
 	friend CInputArchive& operator>>(CInputArchive& inArchive, SMeshData& inData) {
 		inArchive >> inData.mHasVertexColor;
 
-		std::vector<uint8> indices0;
-		std::vector<uint16> indices1;
-		std::vector<storedIndex> indices2;
-		std::vector<uint32> indices3;
+		TVector<uint8> indices0;
+		TVector<uint16> indices1;
+		TVector<storedIndex> indices2;
+		TVector<uint32> indices3;
 
 		inArchive >> indices0;
 		inArchive >> indices1;
 		inArchive >> indices2;
 		inArchive >> indices3;
 
-		inData.indices.append_range(indices0);
-		inData.indices.append_range(indices1);
+		inData.indices.append(indices0);
+		inData.indices.append(indices1);
 		for (auto [i1, i2, i3] : indices2) {
 			const int32 i = i1 | i2 << 8 | i3 << 16;
-			inData.indices.push_back(i);
+			inData.indices.push(i);
 		}
-		inData.indices.append_range(indices3);
+		inData.indices.append(indices3);
 
 		size_t size;
 		inArchive >> size;
@@ -182,14 +193,14 @@ class CEngineLoader : public SObject {
 		std::filesystem::path path = SPaths::get()->mAssetPath;
 		path.append(inFileName);
 
-		CFileArchive file(path.string(), "wb");
+		CFileArchive<EOpenType::BINARY_WRITE> file(path.string());
 		file << inValue;
 		file.close();
 	}
 
 	template <typename TType>
 	static TType load(const std::filesystem::path& inPath) {
-		CFileArchive file(inPath.string(), "rb");
+		CFileArchive<EOpenType::BINARY_READ> file(inPath.string());
 
 		TType value;
 		file >> value;

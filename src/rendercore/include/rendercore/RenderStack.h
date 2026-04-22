@@ -3,11 +3,12 @@
 #include <stack>
 
 #include "basic/core/Common.h"
+#include "sstl/Stack.h"
 
 struct SRenderStack {
 
 	~SRenderStack() noexcept(false) {
-		if (m_MatrixStack.empty()) return;
+		if (m_MatrixStack.isEmpty()) return;
 		errs("Render Stack was not fully destroyed!");
 	}
 
@@ -19,7 +20,7 @@ struct SRenderStack {
 	}
 
 	void push() {
-		if (m_MatrixStack.empty()) {
+		if (m_MatrixStack.isEmpty()) {
 			m_MatrixStack.push(Matrix4f{1.f});
 			return;
 		}
@@ -39,19 +40,19 @@ struct SRenderStack {
 
 	operator Matrix4f() const { return get(); }
 
-	friend CArchive& operator<<(CArchive& inArchive, const SRenderStack& inRenderStack) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const SRenderStack& inRenderStack) {
 		inArchive << inRenderStack.m_MatrixStack;
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, SRenderStack& inRenderStack) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, SRenderStack& inRenderStack) {
 		inArchive >> inRenderStack.m_MatrixStack;
 		return inArchive;
 	}
 
 protected:
 
-	std::stack<Matrix4f> m_MatrixStack;
+	TStack<Matrix4f> m_MatrixStack;
 
 };
 

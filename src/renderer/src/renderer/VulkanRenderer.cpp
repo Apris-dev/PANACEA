@@ -129,9 +129,9 @@ void CVulkanRenderer::destroy() {
 
 	mEngineTextures.destroy();
 
-	mFrameData.data().forEach([](size_t, TUnique<FrameData>& ptr) {
+	for (auto& ptr : mFrameData.data()) {
 		ptr.destroy();
-	});
+	}
 
 	mUploadContext->mUploadFence.destroy();
 
@@ -253,9 +253,9 @@ void CVulkanRenderer::render(SRendererInfo& info) {
 			//TODO: personal ObjectRenderer for passes instead
 			// Tell all renderers that rendering has begun
 
-			CObjectRendererRegistry::get()->getObjects().forEach([](const TPair<std::string, const TUnique<CObjectRenderer>&>& pair) {
-				pair.second->begin();
-			});
+			for (const auto& pair : CObjectRendererRegistry::get()->getObjects()) {
+				pair.second()->begin();
+			}
 
 			cmd->setViewportScissor(info.viewport->mExtent);
 
@@ -282,9 +282,9 @@ void CVulkanRenderer::render(SRendererInfo& info) {
 			cmd->endRendering();
 
 			// Tell all renderers that rendering has ended
-			CObjectRendererRegistry::get()->getObjects().forEach([](const TPair<std::string, const TUnique<CObjectRenderer>&>& pair) {
-				pair.second->end();
-			});
+			for (const auto& pair : CObjectRendererRegistry::get()->getObjects()) {
+				pair.second()->end();
+			}
 
 			// Tell all passes that rendering has begun
 			for (const auto& pass : getPasses()) {

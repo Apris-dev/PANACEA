@@ -17,9 +17,10 @@ void CVRIAllocator::destroy2() {
         popDeferredQueue(overlap);
     }
 
-    m_Resources.forEachReverse([&](size_t, const TFrail<SVRIResource>& resource) {
+    for (auto itr = m_Resources.rbegin(); itr != m_Resources.rend(); ++itr) {
+        const TFrail<SVRIResource>& resource = *itr;
         resource->getDestroyer()();
-    });
+    }
     m_Resources.clear();
 
     vmaDestroyAllocator(m_Allocator);

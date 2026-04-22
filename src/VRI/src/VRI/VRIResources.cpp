@@ -11,6 +11,7 @@
 #include <wrl.h>
 
 #include "VkBootstrap.h"
+#include "sarch/FileArchive.h"
 #include "VRI/BindlessResources.h"
 #include "VRI/VRIAllocator.h"
 #include "VRI/VRICommands.h"
@@ -105,7 +106,7 @@ uint32 SShader::compile() {
 }
 
 std::string readShaderFile(const char* inFileName) {
-	CFileArchive file(inFileName, "r");
+	CFileArchive<EOpenType::READ> file(inFileName);
 
 	if (!file.isOpen()) {
 		printf("I/O error. Cannot open shader file '%s'\n", inFileName);
@@ -134,13 +135,13 @@ std::string readShaderFile(const char* inFileName) {
 }
 
 bool SShader::loadShader(const char* inFileName, uint32 Hash) {
-	CFileArchive file(inFileName, "rb");
+	CFileArchive<EOpenType::BINARY_READ> file(inFileName);
 
 	if (!file.isOpen()) {
 		return false;
 	}
 
-	std::vector<uint32> code = file.readFile<uint32>();
+	TVector<uint32> code = file.readFile<uint32>();
 
 	// The first uint32 value is the hash, if it does not equal the hash for the shader code, it means the shader has changed
 	if (code[0] != Hash) {
@@ -149,14 +150,14 @@ bool SShader::loadShader(const char* inFileName, uint32 Hash) {
 	}
 
 	// Remove the hash so it doesnt mess up the SPIRV shader
-	code.erase(code.begin());
+	code.popAt(0);
 
 	// Create a new shader module, using the buffer we loaded
 	VkShaderModuleCreateInfo createInfo {
 		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 		.pNext = nullptr,
 		// CodeSize has to be in bytes, so multply the ints in the buffer by size of
-		.codeSize = code.size() * sizeof(uint32),
+		.codeSize = code.getSize() * sizeof(uint32),
 		.pCode = code.data()
 	};
 
@@ -168,7 +169,7 @@ bool SShader::loadShader(const char* inFileName, uint32 Hash) {
 }
 
 bool SShader::saveShader(const char* inFileName, uint32 Hash) const {
-	CFileArchive file(inFileName, "wb");
+	CFileArchive<EOpenType::BINARY_WRITE> file(inFileName);
 
 	// Make sure the file is open
 	if (!file.isOpen()) {

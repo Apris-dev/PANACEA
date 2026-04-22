@@ -108,9 +108,9 @@ TShared<SVRIImage> loadImage(const TFrail<CRenderer>& renderer, const std::files
 
 SFont loadFont(const TFrail<CRenderer>& renderer, const std::filesystem::path& inPath) {
 	SFont font;
-	std::vector<uint8> atlasData;
+	TVector<uint8> atlasData;
 
-	CFileArchive file(inPath.string(), "rb");
+	CFileArchive<EOpenType::BINARY_READ> file(inPath.string());
 	file >> font;
 	file >> atlasData;
 	file.close();
@@ -119,24 +119,25 @@ SFont loadFont(const TFrail<CRenderer>& renderer, const std::filesystem::path& i
 	font.mAtlasImage = TUnique<SVRIImage>{label, VkExtent3D{font.mAtlasSize.x, font.mAtlasSize.y, 1}, VK_FORMAT_R8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_IMAGE_ASPECT_COLOR_BIT};
 
 	renderer->immediateSubmit([&](const TFrail<CVRICommands>& cmd) {
-		font.mAtlasImage->push(cmd, atlasData.data(), atlasData.size());
+		font.mAtlasImage->push(cmd, atlasData.data(), atlasData.getSize());
 	});
 
 	return font;
 }
 
-using MeshData = std::vector<std::pair<std::string, std::shared_ptr<SMeshData>>>;
+using MeshData = TVector<TPair<std::string, TShared<SMeshData>>>;
 
-void optimizeMesh(std::vector<uint32>& indices, std::vector<SVertex>& vertices) {
-	const size_t numIndices = indices.size();
-	const size_t numVertices = vertices.size();
+void optimizeMesh(TVector<uint32>& indices, TVector<SVertex>& vertices) {
+	const size_t numIndices = indices.getSize();
+	const size_t numVertices = vertices.getSize();
 
 	// Create a remap table
-	std::vector<uint32> remap(numIndices);
+	TVector<uint32> remap;
+	remap.resize(numIndices);
 	const size_t optimizedVertexCount = meshopt_generateVertexRemap(remap.data(), indices.data(), numIndices, vertices.data(), numVertices, sizeof(SVertex));
 
-	std::vector<uint32> optimizedIndices;
-	std::vector<SVertex> optimizedVertices;
+	TVector<uint32> optimizedIndices;
+	TVector<SVertex> optimizedVertices;
 	optimizedIndices.resize(numIndices);
 	optimizedVertices.resize(optimizedVertexCount);
 
@@ -157,7 +158,7 @@ void optimizeMesh(std::vector<uint32>& indices, std::vector<SVertex>& vertices) 
 	/*constexpr float Threshold = 0.5f;
 	size_t TargetIndexCount = (size_t)(numIndices * Threshold);
 	float TargetError = 0.2f;
-	std::vector<uint32> SimplifiedIndices(optimizedIndices.size());
+	TVector<uint32> SimplifiedIndices(optimizedIndices.size());
 	size_t optimizedIndexCount = meshopt_simplify(SimplifiedIndices.data(), optimizedIndices.data(), numIndices, &optimizedVertices[0].position.x, optimizedVertexCount, sizeof(SVertex), TargetIndexCount, TargetError);
 
 	SimplifiedIndices.resize(optimizedIndexCount);*/
@@ -213,7 +214,7 @@ MeshData loadGLTF_Internal(std::filesystem::path path) {
 		fastgltf::Mesh& mesh = gltf.meshes[*node.meshIndex];
 
 		auto outMesh = std::make_shared<SMeshData>();
-		savedMeshes.push_back(std::pair<std::string, std::shared_ptr<SMeshData>>{node.name, outMesh});
+		savedMeshes.push(TPair<std::string, TShared<SMeshData>>{node.name, outMesh});
 
 		// Add the object
 		//mLoadedModels.insert(outMesh);
@@ -242,8 +243,8 @@ MeshData loadGLTF_Internal(std::filesystem::path path) {
 			node.transform);
 		}
 
-		std::vector<uint32> indices;
-		std::vector<SVertex> vertices;
+		TVector<uint32> indices;
+		TVector<SVertex> vertices;
 
 		uint32 unnamedSurfaceIndex = 0;
 		for (auto&& p : mesh.primitives) {
@@ -252,11 +253,11 @@ MeshData loadGLTF_Internal(std::filesystem::path path) {
 
 			SStaticMesh::Surface newSurface;
 			newSurface.material = nullptr;
-			newSurface.startIndex = (uint32)indices.size();
+			newSurface.startIndex = (uint32)indices.getSize();
 			newSurface.count = (uint32)gltf.accessors[p.indicesAccessor.value()].count;
 
 			SMeshData::Surface newSurface2;
-			newSurface2.startIndex = (uint32)indices.size();
+			newSurface2.startIndex = (uint32)indices.getSize();
 			newSurface2.count = (uint32)gltf.accessors[p.indicesAccessor.value()].count;
 
 			if (p.materialIndex.has_value()) {
@@ -268,23 +269,23 @@ MeshData loadGLTF_Internal(std::filesystem::path path) {
 
 			newSurface2.name = newSurface.name;
 
-			size_t initial_vtx = vertices.size();
+			size_t initial_vtx = vertices.getSize();
 
 			// load indexes
 			{
 				fastgltf::Accessor& indexaccessor = gltf.accessors[p.indicesAccessor.value()];
-				indices.reserve(indices.size() + indexaccessor.count);
+				indices.reserve(indices.getSize() + indexaccessor.count);
 
 				fastgltf::iterateAccessor<std::uint32_t>(gltf, indexaccessor,
 					[&](std::uint32_t idx) {
-						indices.push_back(idx + initial_vtx);
+						indices.push(idx + initial_vtx);
 					});
 			}
 
 			// load vertex positions and bounds
 			{
 				fastgltf::Accessor& posAccessor = gltf.accessors[p.findAttribute("POSITION")->accessorIndex];
-				vertices.resize(vertices.size() + posAccessor.count);
+				vertices.resize(vertices.getSize() + posAccessor.count);
 
 				fastgltf::iterateAccessorWithIndex<glm::vec3>(gltf, posAccessor,
 					[&](glm::vec3 v, size_t index) {
@@ -334,11 +335,11 @@ MeshData loadGLTF_Internal(std::filesystem::path path) {
 				}
 			}
 
-			outMesh->surfaces.push_back(newSurface2);
+			outMesh->surfaces.push(newSurface2);
 		}
 
 		// If no meshes are loaded, do not upload or add to mesh list
-		if (indices.empty()) {
+		if (indices.isEmpty()) {
 			return {};
 		}
 
@@ -371,7 +372,7 @@ MeshData loadGLTF_Internal(std::filesystem::path path) {
 }
 
 SMeshData readMeshData(const std::filesystem::path& path) {
-	CFileArchive file(path.string(), "rb");
+	CFileArchive<EOpenType::BINARY_READ> file(path.string());
 
 	if (!file.isOpen()) {
 		msgs("Could not open Mesh file {}!", path.string().c_str());
@@ -387,9 +388,9 @@ SMeshData readMeshData(const std::filesystem::path& path) {
 	return outSaveData;
 }
 
-TUnique<SVRIMeshBuffer> uploadMesh(const TFrail<CRenderer>& renderer,  std::span<uint32> indices, std::span<SVertex> vertices) {
-	const size_t vertexBufferSize = vertices.size() * sizeof(SVertex);
-	const size_t indexBufferSize = indices.size() * sizeof(uint32);
+TUnique<SVRIMeshBuffer> uploadMesh(const TFrail<CRenderer>& renderer,  TVector<uint32> indices, TVector<SVertex> vertices) {
+	const size_t vertexBufferSize = vertices.getSize() * sizeof(SVertex);
+	const size_t indexBufferSize = indices.getSize() * sizeof(uint32);
 
 	// Create buffers
 	TUnique<SVRIMeshBuffer> meshBuffers{indexBufferSize, vertexBufferSize};
@@ -449,22 +450,22 @@ void CEngineLoader::load(const TFrail<CRenderer>& renderer) {
 
 	basisu::basisu_encoder_init(gUseOpenCL, false);
 
-	std::vector<std::filesystem::path> textures;
-	std::vector<std::filesystem::path> fonts;
-	std::vector<std::filesystem::path> materials;
-	std::vector<std::filesystem::path> meshes;
+	TVector<std::filesystem::path> textures;
+	TVector<std::filesystem::path> fonts;
+	TVector<std::filesystem::path> materials;
+	TVector<std::filesystem::path> meshes;
 
 	// Add each type to their respective vector
 	for (std::filesystem::recursive_directory_iterator i(SPaths::get()->mAssetPath), end; i != end; ++i) {
 		if (!std::filesystem::is_directory(i->path())) {
 			if (i->path().extension() == ".ktx2") {
-				textures.push_back(i->path());
+				textures.push(i->path());
 			} else if (i->path().extension() == ".fnt") {
-				fonts.push_back(i->path());
+				fonts.push(i->path());
 			} else if (i->path().extension() == ".mat") {
-				materials.push_back(i->path());
+				materials.push(i->path());
 			} else if (i->path().extension() == ".msh") {
-				meshes.push_back(i->path());
+				meshes.push(i->path());
 			}
 		}
 	}
@@ -557,7 +558,7 @@ void CEngineLoader::importFont(const TFrail<CRenderer>& renderer, const std::fil
 
 	FT_Set_Pixel_Sizes(face, 0, FONT_MAX_SIZE);
 
-    std::vector<uint8> atlasData(FONT_ATLAS_SIZE * FONT_ATLAS_SIZE);
+    TVector<uint8> atlasData(FONT_ATLAS_SIZE * FONT_ATLAS_SIZE);
 
 	Vector2f cursor{0.f};
 
@@ -604,7 +605,7 @@ void CEngineLoader::importFont(const TFrail<CRenderer>& renderer, const std::fil
             .mAdvance = face->glyph->advance.x >> 6u,
         };
 
-        font.letters.emplace(character, std::move(letter));
+        font.letters.push(character, std::move(letter));
 
         cursor.x += bitmap.width;
         if (bitmap.rows > maxHeightInRow) {
@@ -612,7 +613,7 @@ void CEngineLoader::importFont(const TFrail<CRenderer>& renderer, const std::fil
         }
     }
 
-    msgs("Created font {} with {} letters.", font.mName.c_str(), font.letters.size());
+    msgs("Created font {} with {} letters.", font.mName.c_str(), font.letters.getSize());
 
 	std::filesystem::path cachedPath = SPaths::get()->mAssetPath.string() + font.mName;
 	cachedPath.replace_extension(".fnt");
@@ -620,11 +621,11 @@ void CEngineLoader::importFont(const TFrail<CRenderer>& renderer, const std::fil
 	const std::string label = font.mName + " Atlas";
 	font.mAtlasImage = TUnique<SVRIImage>{label, VkExtent3D{FONT_ATLAS_SIZE, FONT_ATLAS_SIZE, 1}, VK_FORMAT_R8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_IMAGE_ASPECT_COLOR_BIT};
 	renderer->immediateSubmit([&](const TFrail<CVRICommands>& cmd) {
-		font.mAtlasImage->push(cmd, atlasData.data(), atlasData.size());
+		font.mAtlasImage->push(cmd, atlasData.data(), atlasData.getSize());
 	});
 
 	// Write font and atlas data to file
-	CFileArchive file(cachedPath.string(), "wb");
+	CFileArchive<EOpenType::BINARY_WRITE> file(cachedPath.string());
 	file << font;
 	file << atlasData;
 	file.close();
@@ -663,32 +664,32 @@ void CEngineLoader::importMesh(const TFrail<CRenderer>& renderer, const std::fil
 	const auto meshData = loadGLTF_Internal(inPath);
 
 	// If failed, do not write data
-	if (meshData.empty()) {
+	if (meshData.isEmpty()) {
 		msgs("Mesh {} is empty!", fileName.c_str());
 		return;
 	}
 
 	// Save the mesh data
-	for (const auto& [name, data] : meshData) {
+	for (const auto& pair : meshData) {
 
 		// Create an asset path with the appropriate name
 		std::filesystem::path path = SPaths::get()->mAssetPath;
-		path.append(name + ".msh");
+		path.append(pair.first() + ".msh");
 
 		// Ensure .msh doesn't already exist
 		if (std::filesystem::exists(path)) {
-			msgs("File {} already exists!", name);
+			msgs("File {} already exists!", pair.first());
 			return;
 		}
 
-		CFileArchive file(path.string(), "wb");
+		CFileArchive<EOpenType::BINARY_WRITE> file(path.string());
 
-		file << data;
+		file << pair.second();
 
 		file.close();
 
 		const auto mesh = readMeshData(path);
 
-		get()->mMeshes.emplace(name, toStaticMesh(renderer, mesh, name));
+		get()->mMeshes.emplace(pair.first(), toStaticMesh(renderer, mesh, pair.first()));
 	}
 }

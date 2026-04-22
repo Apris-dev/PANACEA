@@ -74,12 +74,12 @@ struct SStaticInstancer : IInstancer {
 		return m_Instances[index];
 	}
 
-	friend CArchive& operator<<(CArchive& inArchive, const SStaticInstancer& inInstancer) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const SStaticInstancer& inInstancer) {
 		inArchive << inInstancer.m_Instances;
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, SStaticInstancer& inInstancer) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, SStaticInstancer& inInstancer) {
 		inArchive >> inInstancer.m_Instances;
 		return inArchive;
 	}
@@ -130,12 +130,12 @@ struct SSingleInstancer : IInstancer {
 		return m_Instance;
 	}
 
-	friend CArchive& operator<<(CArchive& inArchive, const SSingleInstancer& inInstancer) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const SSingleInstancer& inInstancer) {
 		inArchive << inInstancer.m_Instance;
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, SSingleInstancer& inInstancer) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, SSingleInstancer& inInstancer) {
 		inArchive >> inInstancer.m_Instance;
 		return inArchive;
 	}
@@ -161,11 +161,11 @@ struct SDynamicInstancer : IInstancer {
 
 	void reallocate(SRenderStack& stack) {
 
-		m_Instances.forEach([&](size_t, SInstance& instance) {
+		for (auto& instance : m_Instances) {
 			stack.push(instance.Transform);
 			instance.Transform = stack.get();
 			stack.pop();
-		});
+		}
 
 		const size_t bufferSize = m_Instances.getSize() * sizeof(SInstance);
 

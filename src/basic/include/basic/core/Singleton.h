@@ -43,7 +43,7 @@
 		inline static std::string __singleton_name = (std::string(#n) + __VA_ARGS__); \
 	public: \
 		static TShared<n> get() { \
-			if (!getSingletons().contains(__singleton_name)) \
+			if (!getSingletons().isValid(__singleton_name)) \
 				initSingleton<n>(__singleton_name); \
 			return getSingletons().get(__singleton_name).staticCast<n>(); \
 		} \
@@ -55,7 +55,7 @@ EXPORT TMap<std::string, TShared<SObject>>& getSingletons();
 template <typename TType>
 requires std::is_base_of_v<SObject, TType>
 void initSingleton(const std::string& inName) {
-	if (!getSingletons().contains(inName)) {
+	if (!getSingletons().isValid(inName)) {
 		getSingletons().push(inName, TShared<TType>{});
 	}
 }

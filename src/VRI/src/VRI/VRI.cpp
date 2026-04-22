@@ -109,15 +109,15 @@ void CVRI::init(SDL_Window* inWindow) {
     auto families = physicalDevice.value().get_queue_families();
 
     for (size_t i = 0; i < families.size(); i++) {
-        queueFamilies.forEach([&](auto pair) {
-            if (families[i].queueFlags & queueBits.get(pair.first)) {
+        for (auto& pair : queueFamilies) {
+            if (families[i].queueFlags & queueBits.get(pair.first())) {
                 std::vector<float> vector;
-                pair.second.forEach([&](auto pair2) {
-                    vector.push_back(pair2.second);
-                });
+                for (auto& pair2 : pair.second()) {
+                    vector.push_back(pair2.second());
+                }
                 queueDescriptions.emplace_back(static_cast<uint32>(i), vector);
             }
-        });
+        }
     }
 
     vkb::DeviceBuilder deviceBuilder{physicalDevice.value()};
@@ -125,10 +125,10 @@ void CVRI::init(SDL_Window* inWindow) {
     m_Device = TUnique{deviceBuilder.build().value()};
 
     // Get queues from the device
-    queueFamilies.forEach([&](auto pair) {
-        const uint32 family = m_Device->get_queue_index(pair.first).value();
+    for (auto& pair : queueFamilies) {
+        const uint32 family = m_Device->get_queue_index(pair.first()).value();
         int32 index = 0;
-        pair.second.forEach([&](auto pair2) {
+        for (auto& pair2 : pair.second()) {
             VkQueue queue;
             vkGetDeviceQueue(*m_Device, family, index, &queue);
             index++;
@@ -136,9 +136,9 @@ void CVRI::init(SDL_Window* inWindow) {
                 .mQueue = queue,
                 .mFamily = family
             };
-            mQueues.push(pair2.first, inQueue);
-        });
-    });
+            mQueues.push(pair2.first(), inQueue);
+        }
+    }
 
     m_Allocator = TUnique<CVRIAllocator>{};
 

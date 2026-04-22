@@ -255,6 +255,21 @@ struct Transform3f {
 		return m_Transform;
 	}
 
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const Transform3f& inValue) {
+		inArchive << inValue.m_Position;
+		inArchive << inValue.m_Rotation;
+		inArchive << inValue.m_Scale;
+		return inArchive;
+	}
+
+	friend CInputArchive& operator>>(CInputArchive& inArchive, Transform3f& inValue) {
+		inArchive >> inValue.m_Position;
+		inArchive >> inValue.m_Rotation;
+		inArchive >> inValue.m_Scale;
+		inValue.createMatrix();
+		return inArchive;
+	}
+
 private:
 
 	void createMatrix() {
@@ -297,6 +312,23 @@ struct Transform2f {
 
 	Matrix4f toMatrix() const {
 		return m_Transform;
+	}
+
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const Transform2f& inValue) {
+		inArchive << inValue.m_Origin;
+		inArchive << inValue.m_Position;
+		inArchive << inValue.m_Rotation;
+		inArchive << inValue.m_Scale;
+		return inArchive;
+	}
+
+	friend CInputArchive& operator>>(CInputArchive& inArchive, Transform2f& inValue) {
+		inArchive >> inValue.m_Origin;
+		inArchive >> inValue.m_Position;
+		inArchive >> inValue.m_Rotation;
+		inArchive >> inValue.m_Scale;
+		inValue.createMatrix();
+		return inArchive;
 	}
 
 private:

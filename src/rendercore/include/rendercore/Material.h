@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include "sstl/Array.h"
+
 enum class EMaterialPass : uint8 {
 	OPAQUE,
 	TRANSLUCENT,
@@ -21,9 +23,11 @@ ENUM_OPERATORS(MaterialPass, uint8)
 // If i wish to double pack i need to make sure max textures is uint16
 
 // Safe array for push constants that is always filled by default
-struct SPushConstants : std::array<Vector4f, 8> {
-	SPushConstants() : array() {
-		fill(Vector4f(0.f));
+struct SPushConstants : TArray<Vector4f, 8> {
+	SPushConstants() {
+		TArray::resize([](size_t) {
+			return Vector4f(0.f);
+		});
 	}
 };
 
@@ -53,7 +57,7 @@ public:
 	//TODO: for now this form of saving and loading should suffice
 	// but before going any further, a class with a standard c implementation should be used
 
-	friend CArchive& operator<<(CArchive& inArchive, const CMaterial& inMaterial) {
+	friend COutputArchive& operator<<(COutputArchive& inArchive, const CMaterial& inMaterial) {
 		if (inMaterial.mShouldSave) {
 			inArchive << getHash(inMaterial.mName);
 			inArchive << inMaterial.mName;
@@ -64,7 +68,7 @@ public:
 		return inArchive;
 	}
 
-	friend CArchive& operator>>(CArchive& inArchive, CMaterial& inMaterial) {
+	friend CInputArchive& operator>>(CInputArchive& inArchive, CMaterial& inMaterial) {
 		if (inMaterial.mShouldSave) {
 			int32 hash;
 			inArchive >> hash;//TODO: hash
