@@ -1,30 +1,40 @@
 [submodule "third_party/sdl"]
 	path = third_party/sdl
 	url = https://github.com/libsdl-org/SDL
+	branch = main
 [submodule "third_party/fmt"]
 	path = third_party/fmt
 	url = https://github.com/fmtlib/fmt
+	branch = main
 [submodule "third_party/fastgltf"]
 	path = third_party/fastgltf
 	url = https://github.com/spnda/fastgltf
+	branch = main
 [submodule "third_party/tracy"]
 	path = third_party/tracy
 	url = https://github.com/wolfpld/tracy
+	branch = master
 [submodule "third_party/meshoptimizer"]
 	path = third_party/meshoptimizer
 	url = https://github.com/zeux/meshoptimizer
+	branch = master
 [submodule "third_party/basis_universal"]
 	path = third_party/basis_universal
 	url = https://github.com/BinomialLLC/basis_universal
+	branch = master
 [submodule "third_party/glm"]
 	path = third_party/glm
 	url = https://github.com/g-truc/glm
+	branch = master
 [submodule "third_party/freetype"]
 	path = third_party/freetype
 	url = https://github.com/freetype/freetype
+	branch = master
 [submodule "third_party/simplecpp"]
 	path = third_party/simplecpp
 	url = https://github.com/Apris-dev/SimpleCPP.git
+	branch = main
 [submodule "third_party/vk-bootstrap"]
 	path = third_party/vk-bootstrap
 	url = https://github.com/charles-lunarg/vk-bootstrap.git
+	branch = main

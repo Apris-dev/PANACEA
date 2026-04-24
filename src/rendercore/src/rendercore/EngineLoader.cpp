@@ -516,8 +516,9 @@ void CEngineLoader::importTexture(const TFrail<CRenderer>& renderer, const std::
 	constexpr uint32 quality = 255;
 
 	// TODO cETC1S is supremely smaller, but takes significantly longer to compress. cETC1S should be the main format.
+	// TODO: check out other formats
 	void* pKTX2_data = basisu::basis_compress(
-		basist::basis_tex_format::cUASTC4x4,
+		basist::basis_tex_format::cUASTC_LDR_4x4,
 		images,
 		basisu::cFlagGenMipsClamp | basisu::cFlagKTX2 | basisu::cFlagSRGB | basisu::cFlagThreaded | basisu::cFlagUseOpenCL | basisu::cFlagDebug | basisu::cFlagPrintStats | basisu::cFlagPrintStatus, 0.0f,
 		&file_size,
