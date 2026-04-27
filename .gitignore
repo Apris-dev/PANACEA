@@ -6,6 +6,11 @@
 !*.cpp
 !*.h
 
+# Scripts
+!*.bat
+!*.ps1
+!*.sh
+
 # Shader Files
 !*.hlsl
 !*.vert
