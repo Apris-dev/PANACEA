@@ -45,6 +45,10 @@ CEngineViewport::CEngineViewport() {
 		SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE
 	);
 
+	if (!mWindow) {
+		msgs("Error creating Window. Error: {}", SDL_GetError());
+	}
+
 }
 
 void CEngineViewport::destroy() {

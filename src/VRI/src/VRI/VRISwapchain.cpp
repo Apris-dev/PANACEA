@@ -7,7 +7,6 @@
 #include "VRI/VRICommands.h"
 
 #include "vulkan/vulkan_core.h"
-#include "vulkan/vk_enum_string_helper.h"
 
 #define SWAPCHAIN_CHECK(call, failedCall) \
 	if (auto vkResult = call; vkResult != VK_SUCCESS) { \

@@ -1,7 +1,5 @@
 ﻿#include "VRI/VRICommands.h"
 
-#include <vulkan/vk_enum_string_helper.h>
-
 #include "VRI/VRI.h"
 #include "VRI/VRIResources.h"
 #include "tracy/Tracy.hpp"

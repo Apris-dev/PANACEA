@@ -11,9 +11,9 @@
 #include <meshoptimizer.h>
 
 #include "freetype/freetype.h"
-#include "encoder/basisu_comp.h"
-#include "transcoder/basisu_transcoder.h"
-#include "encoder/basisu_gpu_texture.h"
+#include "basisu/encoder/basisu_comp.h"
+#include "basisu/transcoder/basisu_transcoder.h"
+#include "basisu/encoder/basisu_gpu_texture.h"
 #include "rendercore/Font.h"
 
 #include "rendercore/StaticMesh.h"

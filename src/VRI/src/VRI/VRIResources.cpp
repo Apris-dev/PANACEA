@@ -7,7 +7,7 @@
 #include <combaseapi.h>
 #include <filesystem>
 
-#include "dxc/dxcapi.h"
+#include "directx-dxc/dxcapi.h"
 #include <wrl.h>
 
 #include "VkBootstrap.h"

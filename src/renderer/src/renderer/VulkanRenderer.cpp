@@ -7,7 +7,6 @@
 
 #include "scene/world/Camera.h"
 #include "rendercore/VulkanUtils.h"
-#include "vulkan/vk_enum_string_helper.h"
 #include "VkBootstrap.h"
 #include "engine/Engine.h"
 

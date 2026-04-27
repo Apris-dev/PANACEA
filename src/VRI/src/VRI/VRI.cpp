@@ -19,6 +19,11 @@ void CVRI::init(SDL_Window* inWindow) {
 	// Ensure the VRI is only initialized once
 	astsOnce(CVRI);
 
+    if (!inWindow) {
+        msgs("A valid window must be input into CVRI::init.");
+        return;
+    }
+
 	// Initializes the vkb instance
 	vkb::InstanceBuilder builder;
 
@@ -28,10 +33,21 @@ void CVRI::init(SDL_Window* inWindow) {
 			.require_api_version(1, 3, 0)
 			.build();
 
+    if (!instance.has_value()) {
+        auto error = instance.error();
+        msgs("Error creating instance. Error: {}", error.message());
+        return;
+    }
+
 	m_Instance = TUnique{instance.value()};
 
 	// Create a surface for Device to reference
 	SDL_Vulkan_CreateSurface(inWindow, m_Instance->instance, nullptr, &m_Surface);
+
+    if (!m_Surface) {
+        msgs("Error creating surface.");
+        return;
+    }
 
 	// Create the vulkan device
     // Swapchain Maintenance features
@@ -85,6 +101,12 @@ void CVRI::init(SDL_Window* inWindow) {
             .add_required_extension_features(swapchainMaintenance1Features)
             .set_surface(m_Surface)
             .select();
+
+    if (!physicalDevice.has_value()) {
+        auto error = physicalDevice.error();
+        msgs("Error creating physical device. Error: {}", error.message());
+        return;
+    }
 
     TPriorityMap<vkb::QueueType, size_t> queueBits;
 

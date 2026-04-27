@@ -1,13 +1,12 @@
 ﻿create_module(PANACEA-rendercore SHARED)
 
-find_package(Vulkan REQUIRED)
 add_dependencies(PANACEA-rendercore
     PRIVATE
         SDL3::SDL3
         fastgltf::fastgltf
-        freetype
-        basisu_encoder
-        meshoptimizer
+        Freetype::Freetype
+        basisu::basisu_encoder
+        meshoptimizer::meshoptimizer
     PUBLIC
         vk-bootstrap::vk-bootstrap
         Vulkan::Vulkan

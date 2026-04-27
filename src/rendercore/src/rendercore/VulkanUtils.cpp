@@ -1,7 +1,6 @@
 ﻿#include "rendercore/VulkanUtils.h"
 
 #include <vulkan/vulkan_core.h>
-#include <vulkan/vk_enum_string_helper.h>
 
 #include "rendercore/VulkanResources.h"
 #include "basic/Profiling.h"
