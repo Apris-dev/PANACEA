@@ -50,7 +50,7 @@ public:
 
 	struct FrameData {
 
-		EXPORT FrameData(const VkCommandPoolCreateInfo& info);
+		EXPORT FrameData(uint32 queueFamilyIndex, CCommandPool::Flags flags = CCommandPool::NONE);
 
 		EXPORT ~FrameData();
 

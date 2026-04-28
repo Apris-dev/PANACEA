@@ -29,8 +29,8 @@
 ADD_COMMAND(bool, UseVsync, true);
 #undef SETTINGS_CATEGORY
 
-CVulkanRenderer::FrameData::FrameData(const VkCommandPoolCreateInfo& info) {
-	mCommandPool = TUnique<CCommandPool>{info};
+CVulkanRenderer::FrameData::FrameData(const uint32 queueFamilyIndex, const CCommandPool::Flags flags) {
+	mCommandPool = VRICreateCommandPool(queueFamilyIndex, flags);
 
 	// Allocate the default command buffer that we will use for rendering
 	mCommands = TUnique<CVRICommands>{mCommandPool};
@@ -70,7 +70,7 @@ void CVulkanRenderer::immediateSubmit(std::function<void(TFrail<CVRICommands>)>&
 		VK_CHECK(vkWaitForFences(CVRI::get()->getDevice()->device, 1, &upload.mUploadFence->mFence, true, 1000000000));
 
 		// reset the command buffers inside the command pool
-		VK_CHECK(vkResetCommandPool(CVRI::get()->getDevice()->device, *upload.mCommandPool, 0));
+		VK_CHECK(vkResetCommandPool(CVRI::get()->getDevice()->device, upload.mCommandPool->get(), 0));
 	});
 }
 
@@ -86,9 +86,8 @@ void CVulkanRenderer::init() {
 
 	//CBindlessResources::get()->init();
 
-	VkCommandPoolCreateInfo uploadCommandPoolInfo = CVulkanInfo::createCommandPoolInfo(CVRI::get()->getQueue(EQueueType::UPLOAD).mFamily);
 	//create pool for upload context
-	mUploadContext->mCommandPool = TUnique<CCommandPool>{uploadCommandPoolInfo};
+	mUploadContext->mCommandPool = VRICreateCommandPool(CVRI::get()->getQueue(EQueueType::UPLOAD).mFamily);
 
 	//allocate the default command buffer that we will use for the instant commands
 	mUploadContext->mCommands = TUnique<CVRICommands>(mUploadContext->mCommandPool);
@@ -99,11 +98,10 @@ void CVulkanRenderer::init() {
 	{
 		// Create a command pool for commands submitted to the graphics queue.
 		// We also want the pool to allow for resetting of individual command buffers
-		const VkCommandPoolCreateInfo commandPoolInfo = CVulkanInfo::createCommandPoolInfo(
-			CVRI::get()->getQueue(EQueueType::GRAPHICS).mFamily, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
-
 		mFrameData.data().resize([&](size_t) {
-			return TUnique<FrameData>(commandPoolInfo);
+			return TUnique<FrameData>(
+				CVRI::get()->getQueue(EQueueType::GRAPHICS).mFamily, CCommandPool::RESET_COMMAND_BUFFER
+			);
 		});
 	}
 

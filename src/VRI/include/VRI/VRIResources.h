@@ -178,7 +178,33 @@ struct SVRIResource {
 		Vk##n m##n = nullptr; \
 	}
 
-CREATE_VK_TYPE(CommandPool);
+struct CCommandPool : SVRIResource {
+
+	enum Flags {
+		NONE = 0,
+		TRANSIENT = 0x00000001,
+		RESET_COMMAND_BUFFER = 0x00000002,
+		PROTECTED = 0x00000004,
+	};
+
+	CCommandPool() = default;
+
+	VkCommandPool get() const { return mCommandPool; }
+
+	virtual std::function<void()> getDestroyer() override {
+		return [CommandPool = mCommandPool] {
+			vkDestroyCommandPool(CVRI::get()->getDevice()->device, CommandPool, nullptr);
+		};
+	}
+
+private:
+	EXPORT friend TUnique<CCommandPool> VRICreateCommandPool(uint32, Flags);
+	VkCommandPool mCommandPool = nullptr;
+};
+
+EXPORT TUnique<CCommandPool> VRICreateCommandPool(uint32 queueFamilyIndex, CCommandPool::Flags flags = CCommandPool::NONE);
+
+//CREATE_VK_TYPE(CommandPool);
 CREATE_VK_TYPE(DescriptorPool);
 CREATE_VK_TYPE(DescriptorSetLayout);
 CREATE_VK_TYPE(Fence);

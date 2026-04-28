@@ -9,7 +9,7 @@ CVRICommands::CVRICommands(const TFrail<CCommandPool>& inCmdPool) {
 	const VkCommandBufferAllocateInfo frameCmdAllocInfo {
 		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 	   .pNext = nullptr,
-	   .commandPool = inCmdPool->mCommandPool,
+	   .commandPool = inCmdPool->get(),
 	   .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
 	   .commandBufferCount = 1
    };

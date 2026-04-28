@@ -4,6 +4,7 @@
 #include "VkBootstrap.h"
 
 #include "tracy/Tracy.hpp"
+#include "VRI/VRIAllocator.h"
 #include "VRI/VRICommands.h"
 
 #include "vulkan/vulkan_core.h"
@@ -23,29 +24,25 @@ std::function<void()> SSwapchainImage::getDestroyer() {
 }
 
 void SSwapchain::init(const vkb::Result<vkb::Swapchain>& inSwapchainBuilder) {
+	msgs("SSwapchain");
+
 	//store swapchain and its related images
 	mInternalSwapchain = std::make_shared<vkb::Swapchain>(inSwapchainBuilder.value());
 
 	const std::vector<VkImage> images = mInternalSwapchain->get_images().value();
 	const std::vector<VkImageView> imageViews = mInternalSwapchain->get_image_views().value();
 
-	constexpr VkSemaphoreCreateInfo semaphoreCreateInfo {
-		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-		.pNext = nullptr,
-		.flags = 0
-   };
+	msgs("Swapchain Render Semaphores");
 
 	// Allocate render semaphores
 	mSwapchainRenderSemaphores.resize(images.size(), [&](const size_t i){
-		return TUnique<CSemaphore>{semaphoreCreateInfo};
+		return VRICreateSemaphore();
 	});
 
+	msgs("Swapchain Images");
+
 	mSwapchainImages.resize(images.size(), [&](const size_t i){
-		TUnique<SSwapchainImage> image{};
-		image->mImage = images[i];
-		image->mImageView = imageViews[i];
-		image->mBindlessAddress = i;
-		return std::move(image);
+		return VRICreateSwapchainImage(images[i], imageViews[i], i);
 	});
 }
 
@@ -68,32 +65,18 @@ CVRISwapchain::CVRISwapchain(SDL_Window* window): m_Window(window) {
 		return TUnique<FrameData>{};
 	});
 
+	msgs("Swapchain Frames");
+
 	// Create one fence to control when the gpu has finished rendering the frame,
 	// And 2 semaphores to synchronize rendering with swapchain
-	constexpr VkFenceCreateInfo fenceCreateInfo {
-		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-	   .pNext = nullptr,
-	   .flags = VK_FENCE_CREATE_SIGNALED_BIT
-   };
-
-	constexpr VkSemaphoreCreateInfo semaphoreCreateInfo {
-		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-		.pNext = nullptr,
-		.flags = 0
-	};
-
-	msgs("Pre Frames");
-
 	for (const auto& data : m_Frames.data()) {
-		data->mRenderFence = TUnique<CFence>{fenceCreateInfo};
-		data->mSwapchainSemaphore = TUnique<CSemaphore>{semaphoreCreateInfo};
+		data->mRenderFence = VRICreateFence(true);
+		data->mSwapchainSemaphore = VRICreateSemaphore();
 	}
 
-	msgs("Pre Create");
+	msgs("Swapchain Create");
 
 	create(VK_NULL_HANDLE);
-
-	msgs("Post Create");
 }
 
 void CVRISwapchain::create(const VkSwapchainKHR oldSwapchain, const bool inUseVSync) {
