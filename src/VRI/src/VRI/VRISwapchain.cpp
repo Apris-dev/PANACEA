@@ -42,7 +42,11 @@ void SSwapchain::init(const vkb::Result<vkb::Swapchain>& inSwapchainBuilder) {
 	msgs("Swapchain Images");
 
 	mSwapchainImages.resize(images.size(), [&](const size_t i){
-		return VRICreateSwapchainImage(images[i], imageViews[i], i);
+		TUnique<SSwapchainImage> image{};
+		image->mImage = images[i];
+		image->mImageView = imageViews[i];
+		image->mBindlessAddress = i;
+		return image;
 	});
 }
 
@@ -70,7 +74,7 @@ CVRISwapchain::CVRISwapchain(SDL_Window* window): m_Window(window) {
 	// Create one fence to control when the gpu has finished rendering the frame,
 	// And 2 semaphores to synchronize rendering with swapchain
 	for (const auto& data : m_Frames.data()) {
-		data->mRenderFence = VRICreateFence(true);
+		data->mRenderFence = VRICreateFence(CFence::SIGNALED);
 		data->mSwapchainSemaphore = VRICreateSemaphore();
 	}
 
@@ -130,7 +134,7 @@ TUnique<SSwapchainImage>& CVRISwapchain::getSwapchainImage() {
 	ZoneName(zoneName.c_str(), zoneName.size());
 
 	uint32 swapchainImageIndex = 0;
-	SWAPCHAIN_CHECK(vkAcquireNextImageKHR(CVRI::get()->getDevice()->device, *mSwapchain->mInternalSwapchain, 1000000000, *m_Frames.getFrame(m_Buffering.getFrameIndex())->mSwapchainSemaphore, nullptr, &swapchainImageIndex), setDirty());
+	SWAPCHAIN_CHECK(vkAcquireNextImageKHR(CVRI::get()->getDevice()->device, *mSwapchain->mInternalSwapchain, 1000000000, m_Frames.getFrame(m_Buffering.getFrameIndex())->mSwapchainSemaphore->get(), nullptr, &swapchainImageIndex), setDirty());
 
 	return mSwapchain->mSwapchainImages[swapchainImageIndex];
 }
@@ -142,7 +146,7 @@ bool CVRISwapchain::wait() const {
 	ZoneName(zoneName.c_str(), zoneName.size());
 
 	auto& frame = m_Frames.getFrame(m_Buffering.getFrameIndex());
-	VK_CHECK(vkWaitForFences(CVRI::get()->getDevice()->device, 1, &frame->mRenderFence->mFence, true, 1000000000));
+	VK_CHECK(vkWaitForFences(CVRI::get()->getDevice()->device, 1, &frame->mRenderFence->get(), true, 1000000000));
 	//VK_CHECK(vkWaitForFences(inDevice->getDevice().device, 1, &frame.mPresentFence, true, 1000000000));
 
 	return true;
@@ -155,7 +159,7 @@ void CVRISwapchain::reset() const {
 	ZoneName(zoneName.c_str(), zoneName.size());
 
 	auto& frame = m_Frames.getFrame(m_Buffering.getFrameIndex());
-	VK_CHECK(vkResetFences(CVRI::get()->getDevice()->device, 1, &frame->mRenderFence->mFence));
+	VK_CHECK(vkResetFences(CVRI::get()->getDevice()->device, 1, &frame->mRenderFence->get()));
 	//VK_CHECK(vkResetFences(inDevice->getDevice().device, 1, &frame.mPresentFence));
 }
 
@@ -171,13 +175,13 @@ void CVRISwapchain::submit(const TFrail<CVRICommands>& inCmd, const VkQueue inGr
 		VkSemaphoreSubmitInfo waitInfo {
 			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO,
 		   .pNext = nullptr,
-		   .semaphore = *frame->mSwapchainSemaphore,
+		   .semaphore = frame->mSwapchainSemaphore->get(),
 		   .value = 1,
 		   .stageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR,
 		   .deviceIndex = 0
 		};
 
-		const VkSemaphore renderSemaphore = *mSwapchain->mSwapchainRenderSemaphores[inSwapchainImageIndex];
+		const VkSemaphore renderSemaphore = mSwapchain->mSwapchainRenderSemaphores[inSwapchainImageIndex]->get();
 		VkSemaphoreSubmitInfo signalInfo {
 			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO,
 		   .pNext = nullptr,
@@ -200,7 +204,7 @@ void CVRISwapchain::submit(const TFrail<CVRICommands>& inCmd, const VkQueue inGr
 		   .signalSemaphoreInfoCount = static_cast<uint32>(1),
 		   .pSignalSemaphoreInfos = &signalInfo
 		};
-		VK_CHECK(vkQueueSubmit2(inGraphicsQueue, 1, &submit, *frame->mRenderFence));
+		VK_CHECK(vkQueueSubmit2(inGraphicsQueue, 1, &submit, frame->mRenderFence->get()));
 	}
 
 	// Present
@@ -215,7 +219,7 @@ void CVRISwapchain::submit(const TFrail<CVRICommands>& inCmd, const VkQueue inGr
 			.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 			.pNext = nullptr,
 			.waitSemaphoreCount = 1,
-			.pWaitSemaphores = &mSwapchain->mSwapchainRenderSemaphores[inSwapchainImageIndex]->mSemaphore,
+			.pWaitSemaphores = &mSwapchain->mSwapchainRenderSemaphores[inSwapchainImageIndex]->get(),
 			.swapchainCount = 1,
 			.pSwapchains = &mSwapchain->mInternalSwapchain->swapchain,
 			.pImageIndices = &inSwapchainImageIndex,

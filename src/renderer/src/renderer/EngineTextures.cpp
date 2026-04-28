@@ -28,20 +28,20 @@ CEngineTextures::CEngineTextures(const TFrail<CRenderer>& renderer) {
 		samplerCreateInfo.minFilter = VK_FILTER_NEAREST;
 		samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
 
-		mNearestSampler = TUnique<CSampler>{samplerCreateInfo};
+		mNearestSampler = VRICreateSampler(samplerCreateInfo);
 
 		samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
 		samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
 		samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-		mLinearSampler = TUnique<CSampler>{samplerCreateInfo};;
+		mLinearSampler = VRICreateSampler(samplerCreateInfo);
 
 		const auto imageDescriptorInfo = VkDescriptorImageInfo{
-			.sampler = *mNearestSampler};
+			.sampler = mNearestSampler->get()};
 
 		const auto writeSet = VkWriteDescriptorSet{
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet = *CBindlessResources::getBindlessDescriptorSet(),
+			.dstSet = CBindlessResources::getBindlessDescriptorSet()->get(),
 			.dstBinding = gSamplerBinding,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
@@ -50,11 +50,11 @@ CEngineTextures::CEngineTextures(const TFrail<CRenderer>& renderer) {
 		};
 
 		const auto imageDescriptorInfo2 = VkDescriptorImageInfo{
-			.sampler = *mLinearSampler};
+			.sampler = mLinearSampler->get()};
 
 		const auto writeSet2 = VkWriteDescriptorSet{
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet = *CBindlessResources::getBindlessDescriptorSet(),
+			.dstSet = CBindlessResources::getBindlessDescriptorSet()->get(),
 			.dstBinding = gSamplerBinding,
 			.dstArrayElement = 1,
 			.descriptorCount = 1,

@@ -25,15 +25,12 @@ void CBindlessResources::init() {
 			VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, gMaxStorageBuffers},
 		};
 
-		VkDescriptorPoolCreateInfo poolCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-			.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT_EXT,
-			.maxSets = gMaxTextures + gMaxSamplers + gMaxUniformBuffers + gMaxStorageBuffers,
-			.poolSizeCount = (uint32)poolSizes.size(),
-			.pPoolSizes = poolSizes.begin()
-		};
-
-		mDescriptorPool = TUnique<CDescriptorPool>{poolCreateInfo};
+		mDescriptorPool = VRICreateDescriptorPool(
+			gMaxTextures + gMaxSamplers + gMaxUniformBuffers + gMaxStorageBuffers,
+			(uint32)poolSizes.size(),
+			poolSizes.begin(),
+			CDescriptorPool::UPDATE_AFTER_BIND
+		);
 	}
 
 	// Create Descriptor Set layout
@@ -75,15 +72,11 @@ void CBindlessResources::init() {
 			.pBindingFlags = inputFlags.begin(),
 		};
 
-		VkDescriptorSetLayoutCreateInfo layoutCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-			.pNext = &flagInfo,
-			.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT,
-			.bindingCount = (uint32)binding.size(),
-			.pBindings = binding.begin(),
-		};
-
-		mDescriptorSetLayout = TUnique<CDescriptorSetLayout>{layoutCreateInfo};
+		mDescriptorSetLayout = VRICreateDescriptorSetLayout(
+			binding.size(),
+			binding.begin(),
+			CDescriptorSetLayout::UPDATE_AFTER_BIND_POOL
+		);
 	}
 
 	{
@@ -94,16 +87,7 @@ void CBindlessResources::init() {
 			.pDescriptorCounts = &maxBinding
 		};
 
-		VkDescriptorSetAllocateInfo allocationCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-			.pNext = &countInfo,
-			.descriptorPool = mDescriptorPool->mDescriptorPool,
-			.descriptorSetCount = 1,
-			.pSetLayouts = &mDescriptorSetLayout->mDescriptorSetLayout
-		};
-
-		mDescriptorSet = TUnique<CDescriptorSet>{allocationCreateInfo};
-
+		mDescriptorSet = VRICreateDescriptorSet(mDescriptorPool->get(), 1, &mDescriptorSetLayout->get());
 	}
 
 	// Create Basic Pipeline Layout
@@ -117,16 +101,12 @@ void CBindlessResources::init() {
 			}
 		};
 
-		VkPipelineLayoutCreateInfo layoutCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-			.pNext = nullptr,
-			.setLayoutCount = 1,
-			.pSetLayouts = &mDescriptorSetLayout->mDescriptorSetLayout,
-			.pushConstantRangeCount = (uint32)pushConstants.size(),
-			.pPushConstantRanges = pushConstants.begin()
-		};
-
-		mPipelineLayout = TUnique<CPipelineLayout>{layoutCreateInfo};
+		mPipelineLayout = VRICreatePipelineLayout(
+			1,
+			&mDescriptorSetLayout->get(),
+			(uint32)pushConstants.size(),
+			pushConstants.begin()
+		);
 	}
 }
 

@@ -61,13 +61,13 @@ void CVulkanRenderer::immediateSubmit(std::function<void(TFrail<CVRICommands>)>&
 
 		const VkSubmitInfo submit = cmd->submitInfo0();
 
-		VK_CHECK(vkResetFences(CVRI::get()->getDevice()->device, 1, &upload.mUploadFence->mFence));
+		VK_CHECK(vkResetFences(CVRI::get()->getDevice()->device, 1, &upload.mUploadFence->get()));
 
 		//submit command buffer to the queue and execute it.
 		// _uploadFence will now block until the graphic commands finish execution
-		VK_CHECK(vkQueueSubmit(CVRI::get()->getQueue(EQueueType::UPLOAD).mQueue, 1, &submit, *upload.mUploadFence));
+		VK_CHECK(vkQueueSubmit(CVRI::get()->getQueue(EQueueType::UPLOAD).mQueue, 1, &submit, upload.mUploadFence->get()));
 
-		VK_CHECK(vkWaitForFences(CVRI::get()->getDevice()->device, 1, &upload.mUploadFence->mFence, true, 1000000000));
+		VK_CHECK(vkWaitForFences(CVRI::get()->getDevice()->device, 1, &upload.mUploadFence->get(), true, 1000000000));
 
 		// reset the command buffers inside the command pool
 		VK_CHECK(vkResetCommandPool(CVRI::get()->getDevice()->device, upload.mCommandPool->get(), 0));
@@ -92,8 +92,7 @@ void CVulkanRenderer::init() {
 	//allocate the default command buffer that we will use for the instant commands
 	mUploadContext->mCommands = TUnique<CVRICommands>(mUploadContext->mCommandPool);
 
-	VkFenceCreateInfo fenceCreateInfo = CVulkanInfo::createFenceInfo(VK_FENCE_CREATE_SIGNALED_BIT);
-	mUploadContext->mUploadFence = TUnique<CFence>{fenceCreateInfo};
+	mUploadContext->mUploadFence = VRICreateFence(CFence::SIGNALED);
 
 	{
 		// Create a command pool for commands submitted to the graphics queue.

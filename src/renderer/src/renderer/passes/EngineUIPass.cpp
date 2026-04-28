@@ -348,15 +348,12 @@ void CEngineUIPass::init(const TFrail<CRenderer> inRenderer) {
 		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
 		{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 } };
 
-	VkDescriptorPoolCreateInfo poolCreateInfo {
-		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-		.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-		.maxSets = 1000,
-		.poolSizeCount = (uint32)std::size(poolSizes),
-		.pPoolSizes = poolSizes
-	};
-
-	imguiPool = TUnique<CDescriptorPool>{poolCreateInfo};
+	imguiPool = VRICreateDescriptorPool(
+		1000,
+		std::size(poolSizes),
+		poolSizes,
+		CDescriptorPool::FREE_DESCRIPTOR_SET
+	);
 
 	// this initializes imgui for Vulkan
 	ImGui_ImplVulkan_InitInfo initInfo {

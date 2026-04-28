@@ -165,35 +165,22 @@ struct SVRIResource {
 	EXPORT void release();
 };
 
-// Create wrappers around Vulkan types that can be destroyed
-#define CREATE_VK_TYPE(n) \
-	struct C##n : SVRIResource { \
-		C##n(Vk##n##CreateInfo inCreateInfo) { \
-			VK_CHECK(vkCreate##n(CVRI::get()->getDevice()->device, &inCreateInfo, nullptr, &m##n)); \
-		} \
-		Vk##n get() { return m##n; } \
-		virtual std::function<void()> getDestroyer() override { return [n = m##n] { vkDestroy##n(CVRI::get()->getDevice()->device, n, nullptr); }; } \
-		Vk##n operator->() const { return m##n; } \
-		operator Vk##n() const { return m##n; } \
-		Vk##n m##n = nullptr; \
-	}
-
 struct CCommandPool : SVRIResource {
 
 	enum Flags {
 		NONE = 0,
 		TRANSIENT = 0x00000001,
 		RESET_COMMAND_BUFFER = 0x00000002,
-		PROTECTED = 0x00000004,
+		PROTECTED = 0x00000004
 	};
 
 	CCommandPool() = default;
 
-	VkCommandPool get() const { return mCommandPool; }
+	[[nodiscard]] VkCommandPool get() const { return mCommandPool; }
 
 	virtual std::function<void()> getDestroyer() override {
-		return [CommandPool = mCommandPool] {
-			vkDestroyCommandPool(CVRI::get()->getDevice()->device, CommandPool, nullptr);
+		return [commandPool = mCommandPool] {
+			vkDestroyCommandPool(CVRI::get()->getDevice()->device, commandPool, nullptr);
 		};
 	}
 
@@ -204,11 +191,111 @@ private:
 
 EXPORT TUnique<CCommandPool> VRICreateCommandPool(uint32 queueFamilyIndex, CCommandPool::Flags flags = CCommandPool::NONE);
 
-//CREATE_VK_TYPE(CommandPool);
-CREATE_VK_TYPE(DescriptorPool);
-CREATE_VK_TYPE(DescriptorSetLayout);
-CREATE_VK_TYPE(Fence);
-CREATE_VK_TYPE(PipelineLayout);
+struct CDescriptorPool : SVRIResource {
+
+	enum Flags {
+		NONE = 0,
+		FREE_DESCRIPTOR_SET = 0x00000001,
+		UPDATE_AFTER_BIND = 0x00000002,
+		HOST_ONLY = 0x00000004,
+		ALLOW_OVERALLOCATION_SETS = 0x00000008,
+		ALLOW_OVERALLOCATION_POOLS = 0x00000010
+	};
+
+	CDescriptorPool() = default;
+
+	[[nodiscard]] VkDescriptorPool get() const { return mDescriptorPool; }
+
+	virtual std::function<void()> getDestroyer() override {
+		return [descriptorPool = mDescriptorPool] {
+			vkDestroyDescriptorPool(CVRI::get()->getDevice()->device, descriptorPool, nullptr);
+		};
+	}
+
+private:
+	EXPORT friend TUnique<CDescriptorPool> VRICreateDescriptorPool(uint32, uint32, const VkDescriptorPoolSize*, Flags);
+	VkDescriptorPool mDescriptorPool = nullptr;
+};
+
+EXPORT TUnique<CDescriptorPool> VRICreateDescriptorPool(uint32 maxSets, uint32 poolSizeCount, const VkDescriptorPoolSize* poolSizes, CDescriptorPool::Flags flags = CDescriptorPool::NONE);
+
+struct CDescriptorSetLayout : SVRIResource {
+
+	enum Flags {
+		NONE = 0,
+		UPDATE_AFTER_BIND_POOL = 0x00000002,
+		PUSH_DESCRIPTOR = 0x00000001,
+		DESCRIPTOR_BUFFER = 0x00000010,
+		EMBEDDED_IMMUTABLE_SAMPLERS = 0x00000020,
+		INDIRECT_BINDABLE = 0x00000080,
+		HOST_ONLY_POOL = 0x00000004,
+		PER_STAGE = 0x00000040
+	};
+
+	CDescriptorSetLayout() = default;
+
+	[[nodiscard]] VkDescriptorSetLayout& get() { return mDescriptorSetLayout; }
+
+	virtual std::function<void()> getDestroyer() override {
+		return [descriptorSetLayout = mDescriptorSetLayout] {
+			vkDestroyDescriptorSetLayout(CVRI::get()->getDevice()->device, descriptorSetLayout, nullptr);
+		};
+	}
+
+private:
+	EXPORT friend TUnique<CDescriptorSetLayout> VRICreateDescriptorSetLayout(uint32, const VkDescriptorSetLayoutBinding*, Flags);
+	VkDescriptorSetLayout mDescriptorSetLayout = nullptr;
+};
+
+EXPORT TUnique<CDescriptorSetLayout> VRICreateDescriptorSetLayout(uint32 bindingCount, const VkDescriptorSetLayoutBinding* bindings, CDescriptorSetLayout::Flags flags = CDescriptorSetLayout::NONE);
+
+struct CFence : SVRIResource {
+
+	enum Flags {
+		NONE = 0,
+		SIGNALED = 0x00000001
+	};
+
+	CFence() = default;
+
+	[[nodiscard]] VkFence& get() { return mFence; }
+
+	virtual std::function<void()> getDestroyer() override {
+		return [fence = mFence] {
+			vkDestroyFence(CVRI::get()->getDevice()->device, fence, nullptr);
+		};
+	}
+
+private:
+	EXPORT friend TUnique<CFence> VRICreateFence(Flags);
+	VkFence mFence = nullptr;
+};
+
+EXPORT TUnique<CFence> VRICreateFence(CFence::Flags flags = CFence::NONE);
+
+struct CPipelineLayout : SVRIResource {
+
+	enum Flags {
+		NONE = 0,
+		INDEPENDENT_SETS = 0x00000002
+	};
+
+	CPipelineLayout() = default;
+
+	[[nodiscard]] VkPipelineLayout get() const { return mPipelineLayout; }
+
+	virtual std::function<void()> getDestroyer() override {
+		return [pipelineLayout = mPipelineLayout] {
+			vkDestroyPipelineLayout(CVRI::get()->getDevice()->device, pipelineLayout, nullptr);
+		};
+	}
+
+private:
+	EXPORT friend TUnique<CPipelineLayout> VRICreatePipelineLayout(uint32, const VkDescriptorSetLayout*, uint32, const VkPushConstantRange*, Flags);
+	VkPipelineLayout mPipelineLayout = nullptr;
+};
+
+EXPORT TUnique<CPipelineLayout> VRICreatePipelineLayout(uint32 setLayoutCount, const VkDescriptorSetLayout* setLayouts, uint32 pushConstantRangeCount, const VkPushConstantRange* pushConstantRages, CPipelineLayout::Flags flags = CPipelineLayout::NONE);
 
 //TODO: rename
 struct SPipeline : SVRIResource {
@@ -228,28 +315,130 @@ struct SPipeline : SVRIResource {
 	CPipelineLayout* mLayout;
 };
 
-CREATE_VK_TYPE(RenderPass);
-CREATE_VK_TYPE(Sampler);
-CREATE_VK_TYPE(Semaphore);
-CREATE_VK_TYPE(ShaderModule); //TODO: remove
+struct CRenderPass : SVRIResource {
 
-#undef CREATE_VK_TYPE
+	enum Flags {
+		NONE = 0,
+		TRANSFORM = 0x00000002,
+		PER_LAYER_FRAGMENT_DENSITY = 0x00000004
+	};
+
+	CRenderPass() = default;
+
+	[[nodiscard]] VkRenderPass& get() { return mRenderPass; }
+
+	virtual std::function<void()> getDestroyer() override {
+		return [renderPass = mRenderPass] {
+			vkDestroyRenderPass(CVRI::get()->getDevice()->device, renderPass, nullptr);
+		};
+	}
+
+private:
+	EXPORT friend TUnique<CRenderPass> VRICreateRenderPass(
+		uint32,
+		const VkAttachmentDescription*,
+		uint32,
+		const VkSubpassDescription*,
+		uint32,
+		const VkSubpassDependency*,
+		Flags
+	);
+	VkRenderPass mRenderPass = nullptr;
+};
+
+EXPORT TUnique<CRenderPass> VRICreateRenderPass(
+	uint32 attachmentCount,
+    const VkAttachmentDescription* attachments,
+    uint32 subpassCount,
+    const VkSubpassDescription* subpasses,
+    uint32 dependencyCount,
+    const VkSubpassDependency* dependencies,
+	CRenderPass::Flags flags = CRenderPass::NONE
+);
+
+struct CSampler : SVRIResource {
+
+	CSampler() = default;
+
+	[[nodiscard]] VkSampler& get() { return mSampler; }
+
+	virtual std::function<void()> getDestroyer() override {
+		return [sampler = mSampler] {
+			vkDestroySampler(CVRI::get()->getDevice()->device, sampler, nullptr);
+		};
+	}
+
+private:
+	EXPORT friend TUnique<CSampler> VRICreateSampler(const VkSamplerCreateInfo&);
+	VkSampler mSampler = nullptr;
+};
+
+EXPORT TUnique<CSampler> VRICreateSampler(const VkSamplerCreateInfo& inCreateInfo);
+
+struct CSemaphore : SVRIResource {
+
+	enum Flags {
+		NONE = 0,
+		SIGNALED = 0x00000001
+	};
+
+	CSemaphore() = default;
+
+	[[nodiscard]] VkSemaphore& get() { return mSemaphore; }
+
+	virtual std::function<void()> getDestroyer() override {
+		return [semaphore = mSemaphore] {
+			vkDestroySemaphore(CVRI::get()->getDevice()->device, semaphore, nullptr);
+		};
+	}
+
+private:
+	EXPORT friend TUnique<CSemaphore> VRICreateSemaphore(Flags);
+	VkSemaphore mSemaphore = nullptr;
+};
+
+EXPORT TUnique<CSemaphore> VRICreateSemaphore(CSemaphore::Flags flags = CSemaphore::NONE);
+
+struct CShaderModule : SVRIResource {
+
+	enum Flags {
+		NONE = 0,
+		DEVICE_ONLY = 0x00000001
+	};
+
+	CShaderModule() = default;
+
+	[[nodiscard]] VkShaderModule& get() { return mShaderModule; }
+
+	virtual std::function<void()> getDestroyer() override {
+		return [shaderModule = mShaderModule] {
+			vkDestroyShaderModule(CVRI::get()->getDevice()->device, shaderModule, nullptr);
+		};
+	}
+
+private:
+	EXPORT friend TUnique<CShaderModule> VRICreateShaderModule(size_t, const uint32*, Flags);
+	VkShaderModule mShaderModule = nullptr;
+};
+
+EXPORT TUnique<CShaderModule> VRICreateShaderModule(size_t codeSize, const uint32* code, CShaderModule::Flags flags = CShaderModule::NONE);
 
 struct CDescriptorSet : SVRIResource {
 
-	CDescriptorSet(const VkDescriptorSetAllocateInfo& inCreateInfo) {
-		VK_CHECK(vkAllocateDescriptorSets(CVRI::get()->getDevice()->device, &inCreateInfo, &mDescriptorSet));
-	}
+	CDescriptorSet() = default;
 
-	void bind(VkCommandBuffer cmd, VkPipelineBindPoint inBindPoint, VkPipelineLayout inPipelineLayout, uint32 inFirstSet, uint32 inDescriptorSetCount) const {
+	[[nodiscard]] VkDescriptorSet& get() { return mDescriptorSet; }
+
+	void bind(const VkCommandBuffer cmd, const VkPipelineBindPoint inBindPoint, const VkPipelineLayout inPipelineLayout, const uint32 inFirstSet, const uint32 inDescriptorSetCount) const {
 		vkCmdBindDescriptorSets(cmd, inBindPoint,inPipelineLayout, inFirstSet, inDescriptorSetCount, &mDescriptorSet, 0, nullptr);
 	}
 
-	VkDescriptorSet operator->() const { return mDescriptorSet; }
-	operator VkDescriptorSet() const { return mDescriptorSet; }
-
+private:
+	EXPORT friend TUnique<CDescriptorSet> VRICreateDescriptorSet(VkDescriptorPool, uint32, const VkDescriptorSetLayout*);
 	VkDescriptorSet mDescriptorSet = nullptr;
 };
+
+EXPORT TUnique<CDescriptorSet> VRICreateDescriptorSet(VkDescriptorPool descriptorPool, uint32 descriptorSetCount, const VkDescriptorSetLayout* setLayouts);
 
 struct SShader : SVRIResource {
 

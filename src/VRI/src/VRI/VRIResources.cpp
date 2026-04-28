@@ -259,16 +259,145 @@ void SVRIResource::release() {
 }
 
 TUnique<CCommandPool> VRICreateCommandPool(const uint32_t queueFamilyIndex, const CCommandPool::Flags flags) {
-	VkCommandPoolCreateInfo commandPoolCreateInfo {
+	VkCommandPoolCreateInfo createInfo {
 		.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-	   .pNext = nullptr,
-	   .flags = static_cast<VkCommandPoolCreateFlags>(flags),
+	    .pNext = nullptr,
+	    .flags = static_cast<VkCommandPoolCreateFlags>(flags),
 		.queueFamilyIndex = queueFamilyIndex
    };
 	TUnique<CCommandPool> commandPool;
-	VK_CHECK(vkCreateCommandPool(CVRI::get()->getDevice()->device, &commandPoolCreateInfo, nullptr, &commandPool->mCommandPool));
+	VK_CHECK(vkCreateCommandPool(CVRI::get()->getDevice()->device, &createInfo, nullptr, &commandPool->mCommandPool));
 	//m_Allocator->m_Resources.push(commandPool);
 	return std::move(commandPool);
+}
+
+TUnique<CDescriptorPool> VRICreateDescriptorPool(const uint32 maxSets, const uint32 poolSizeCount, const VkDescriptorPoolSize* poolSizes, const CDescriptorPool::Flags flags) {
+	VkDescriptorPoolCreateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+	    .pNext = nullptr,
+	    .flags = static_cast<VkDescriptorPoolCreateFlags>(flags),
+		.maxSets = maxSets,
+		.poolSizeCount = poolSizeCount,
+		.pPoolSizes = poolSizes
+   };
+	TUnique<CDescriptorPool> descriptorPool;
+	VK_CHECK(vkCreateDescriptorPool(CVRI::get()->getDevice()->device, &createInfo, nullptr, &descriptorPool->mDescriptorPool));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(descriptorPool);
+}
+
+TUnique<CDescriptorSetLayout> VRICreateDescriptorSetLayout(const uint32 bindingCount, const VkDescriptorSetLayoutBinding* bindings, const CDescriptorSetLayout::Flags flags) {
+	VkDescriptorSetLayoutCreateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = static_cast<VkDescriptorSetLayoutCreateFlags>(flags),
+		.bindingCount = bindingCount,
+		.pBindings = bindings
+   };
+	TUnique<CDescriptorSetLayout> descriptorSetLayout;
+	VK_CHECK(vkCreateDescriptorSetLayout(CVRI::get()->getDevice()->device, &createInfo, nullptr, &descriptorSetLayout->mDescriptorSetLayout));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(descriptorSetLayout);
+}
+
+TUnique<CFence> VRICreateFence(const CFence::Flags flags) {
+	VkFenceCreateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = static_cast<VkFenceCreateFlags>(flags)
+   };
+	TUnique<CFence> fence;
+	VK_CHECK(vkCreateFence(CVRI::get()->getDevice()->device, &createInfo, nullptr, &fence->mFence));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(fence);
+}
+
+TUnique<CPipelineLayout> VRICreatePipelineLayout(const uint32 setLayoutCount, const VkDescriptorSetLayout* setLayouts, const uint32 pushConstantRangeCount, const VkPushConstantRange* pushConstantRages, const CPipelineLayout::Flags flags) {
+	const VkPipelineLayoutCreateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = static_cast<VkPipelineLayoutCreateFlags>(flags),
+		.setLayoutCount = setLayoutCount,
+		.pSetLayouts = setLayouts,
+		.pushConstantRangeCount = pushConstantRangeCount,
+		.pPushConstantRanges = pushConstantRages
+   };
+	TUnique<CPipelineLayout> pipelineLayout;
+	VK_CHECK(vkCreatePipelineLayout(CVRI::get()->getDevice()->device, &createInfo, nullptr, &pipelineLayout->mPipelineLayout));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(pipelineLayout);
+}
+
+TUnique<CRenderPass> VRICreateRenderPass(
+	uint32 attachmentCount,
+	const VkAttachmentDescription* attachments,
+	uint32 subpassCount,
+	const VkSubpassDescription* subpasses,
+	uint32 dependencyCount,
+	const VkSubpassDependency* dependencies,
+	const CRenderPass::Flags flags) {
+	VkRenderPassCreateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = static_cast<VkRenderPassCreateFlags>(flags),
+		.attachmentCount = attachmentCount,
+		.pAttachments = attachments,
+		.subpassCount = subpassCount,
+		.pSubpasses = subpasses,
+		.dependencyCount = dependencyCount,
+		.pDependencies = dependencies
+   };
+	TUnique<CRenderPass> renderPass;
+	VK_CHECK(vkCreateRenderPass(CVRI::get()->getDevice()->device, &createInfo, nullptr, &renderPass->mRenderPass));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(renderPass);
+}
+
+TUnique<CSampler> VRICreateSampler(const VkSamplerCreateInfo& inCreateInfo) {
+	TUnique<CSampler> sampler;
+	VK_CHECK(vkCreateSampler(CVRI::get()->getDevice()->device, &inCreateInfo, nullptr, &sampler->mSampler));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(sampler);
+}
+
+TUnique<CSemaphore> VRICreateSemaphore(const CSemaphore::Flags flags) {
+	VkSemaphoreCreateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = static_cast<VkSemaphoreCreateFlags>(flags)
+   };
+	TUnique<CSemaphore> semaphore;
+	VK_CHECK(vkCreateSemaphore(CVRI::get()->getDevice()->device, &createInfo, nullptr, &semaphore->mSemaphore));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(semaphore);
+}
+
+TUnique<CShaderModule> VRICreateShaderModule(size_t codeSize, const uint32* code, const CShaderModule::Flags flags) {
+	VkShaderModuleCreateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = static_cast<VkShaderModuleCreateFlags>(flags),
+		.codeSize = codeSize,
+		.pCode = code
+   };
+	TUnique<CShaderModule> shaderModule;
+	VK_CHECK(vkCreateShaderModule(CVRI::get()->getDevice()->device, &createInfo, nullptr, &shaderModule->mShaderModule));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(shaderModule);
+}
+
+TUnique<CDescriptorSet> VRICreateDescriptorSet(const VkDescriptorPool descriptorPool, const uint32 descriptorSetCount, const VkDescriptorSetLayout* setLayouts) {
+	const VkDescriptorSetAllocateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+		.pNext = nullptr,
+		.descriptorPool = descriptorPool,
+		.descriptorSetCount = descriptorSetCount,
+		.pSetLayouts = setLayouts
+   };
+	TUnique<CDescriptorSet> descriptorSet;
+	VK_CHECK(vkAllocateDescriptorSets(CVRI::get()->getDevice()->device, &createInfo, &descriptorSet->mDescriptorSet));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(descriptorSet);
 }
 
 SPipeline::SPipeline(const SPipelineCreateInfo& inCreateInfo, CVertexAttributeArchive& inAttributes, const TUnique<CPipelineLayout>& inLayout)
@@ -438,7 +567,7 @@ SPipeline::SPipeline(const SPipelineCreateInfo& inCreateInfo, CVertexAttributeAr
 		.pDepthStencilState = &depthStencilCreateInfo,
 		.pColorBlendState = &colorBlending,
 		.pDynamicState = &dynamicInfo,
-		.layout = inLayout->mPipelineLayout
+		.layout = inLayout->get()
 	};
 
 	if (vkCreateGraphicsPipelines(CVRI::get()->getDevice()->device, VK_NULL_HANDLE, 1, &pipelineInfo,nullptr, &mPipeline) != VK_SUCCESS) {
@@ -537,7 +666,7 @@ void SVRIBuffer::updateGlobal() const {
 
 	const auto writeSet = VkWriteDescriptorSet{
 		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		.dstSet = *CBindlessResources::getBindlessDescriptorSet(),
+		.dstSet = CBindlessResources::getBindlessDescriptorSet()->get(),
 		.dstBinding = gUBOBinding, //TODO: for now UBO bindings
 		.dstArrayElement = mBindlessAddress,
 		.descriptorCount = 1,
@@ -638,7 +767,7 @@ SVRIImage::SVRIImage(const std::string& inDebugName, const VkExtent3D inExtent, 
 
 		const auto writeSet = VkWriteDescriptorSet{
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet = *CBindlessResources::getBindlessDescriptorSet(),
+			.dstSet = CBindlessResources::getBindlessDescriptorSet()->get(),
 			.dstBinding = gTextureBinding,
 			.dstArrayElement = mBindlessAddress,
 			.descriptorCount = 1,

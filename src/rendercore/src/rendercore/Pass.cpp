@@ -47,9 +47,9 @@ void CPass::bindPipeline(const TFrail<CVRICommands>& cmd, SPipeline* inPipeline,
 	//if (inPipeline != m_CurrentPipeline) {
 		m_CurrentPipeline = inPipeline;
 		cmd->bindPipeline(inPipeline, VK_PIPELINE_BIND_POINT_GRAPHICS);
-		cmd->bindDescriptorSets(CBindlessResources::getBindlessDescriptorSet(), VK_PIPELINE_BIND_POINT_GRAPHICS, inPipeline->mLayout->mPipelineLayout, 0, 1);
+		cmd->bindDescriptorSets(CBindlessResources::getBindlessDescriptorSet(), VK_PIPELINE_BIND_POINT_GRAPHICS, inPipeline->mLayout->get(), 0, 1);
 	//}
 
-	cmd->pushConstants(inPipeline->mLayout->mPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SPushConstants), inConstants.data());
+	cmd->pushConstants(inPipeline->mLayout->get(), VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SPushConstants), inConstants.data());
 
 }

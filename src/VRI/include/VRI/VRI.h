@@ -71,13 +71,3 @@ private:
     TPriorityMap<EQueueType, SQueue> mQueues;
 
 };
-
-EXPORT TUnique<struct CFence> VRICreateFence(bool inSignaled = false);
-
-EXPORT TUnique<struct CSemaphore> VRICreateSemaphore();
-
-EXPORT TUnique<struct SSwapchainImage> VRICreateSwapchainImage(
-    struct VkImage_T* inImage = nullptr,
-    struct VkImageView_T* inImageView = nullptr,
-    uint32 inBindlessAddress = -1
-);
