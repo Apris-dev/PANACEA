@@ -166,7 +166,12 @@ void CVRI::init(SDL_Window* inWindow) {
 
     gIsVRIInitialized = true;
 
+    msgs("Pre Swap");
+
     m_Swapchain = TUnique<CVRISwapchain>{inWindow};
+
+    msgs("Post Swap");
+
 }
 
 void CVRI::destroy2() {

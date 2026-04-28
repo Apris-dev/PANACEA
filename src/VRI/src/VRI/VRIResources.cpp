@@ -246,6 +246,7 @@ std::function<void()> SShader::getDestroyer() {
 
 SVRIResource::SVRIResource() {
 	asts(gIsVRIInitialized, "Cannot create VRI Resource before VRI Initialization!");
+		msgs("Attempted to allocate a resource.");
 	CVRI::get()->getAllocator()->pushResource(this);
 }
 

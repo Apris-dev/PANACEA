@@ -78,7 +78,11 @@ void CVulkanRenderer::init() {
 	// Ensure the renderer is only created once
 	astsOnce(CVulkanRenderer);
 
+	msgs("Before VRI Init.");
+
 	CVRI::get()->init(CEngine::get()->getViewport()->mWindow);
+
+	msgs("Post VRI Init.");
 
 	//CBindlessResources::get()->init();
 

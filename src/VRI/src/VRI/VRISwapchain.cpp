@@ -82,6 +82,8 @@ CVRISwapchain::CVRISwapchain(SDL_Window* window): m_Window(window) {
 		.flags = 0
 	};
 
+	msgs("Pre Frames");
+
 	for (const auto& data : m_Frames.data()) {
 		data->mRenderFence = TUnique<CFence>{fenceCreateInfo};
 		//mPresentFence = TUnique<CFence>{fenceCreateInfo};
@@ -90,7 +92,11 @@ CVRISwapchain::CVRISwapchain(SDL_Window* window): m_Window(window) {
 		//mRenderSemaphore = TUnique<CSemaphore>{semaphoreCreateInfo};
 	}
 
+	msgs("Pre Create");
+
 	create(VK_NULL_HANDLE);
+
+	msgs("Post Create");
 }
 
 void CVRISwapchain::create(const VkSwapchainKHR oldSwapchain, const bool inUseVSync) {

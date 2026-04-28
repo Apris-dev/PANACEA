@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Pass.h"
 #include "basic/core/Common.h"
 #include "sstl/Array.h"
 
@@ -13,8 +14,6 @@ namespace vkb {
 typedef struct VkInstance_T* VkInstance;
 typedef struct VkDevice_T* VkDevice;
 typedef struct VkPhysicalDevice_T* VkPhysicalDevice;
-
-class CPass;
 
 /*
  * Base classes for engine access
