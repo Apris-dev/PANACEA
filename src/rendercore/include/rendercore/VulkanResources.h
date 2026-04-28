@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <forward_list>
 #include <vma/vk_mem_alloc.h>
 #include <vulkan/vulkan_core.h>
 

@@ -1,18 +1,17 @@
 #pragma once
 
-#include "rendercore/Pass.h"
+#include "VRI/VRIResources.h"
 #include "sdg/DependencyGraph.h"
 #include "sstl/List.h"
 
 class CVRIContext {
+public:
 
     /*
     * Create Commands
     */
 
     EXPORT TUnique<CFence> createFence(VkFenceCreateFlags inFlags = 0);
-
-    TRWDependencyGraph<TFrail<CPass>, TFrail<SVRIResource>, TKahnTopologicalSort> graph;
 
     TList<TFrail<SVRIResource>> resources;
 

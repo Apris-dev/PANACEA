@@ -11,6 +11,10 @@
 !*.ps1
 !*.sh
 
+# vcpkg Config
+!vcpkg.json
+!vcpkg-configuration.json
+
 # Shader Files
 !*.hlsl
 !*.vert

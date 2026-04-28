@@ -1,0 +1,19 @@
+{
+  "dependencies": [
+    "basisu",
+    "directx-dxc",
+    "fastgltf",
+    "fmt",
+    "freetype",
+    "glm",
+    "meshoptimizer",
+    {
+      "name": "sdl3",
+      "features": ["vulkan"]
+    },
+    "vk-bootstrap",
+    "vulkan",
+    "vulkan-memory-allocator",
+    "tracy"
+  ]
+}

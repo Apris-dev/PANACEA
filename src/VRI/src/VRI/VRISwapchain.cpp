@@ -86,10 +86,7 @@ CVRISwapchain::CVRISwapchain(SDL_Window* window): m_Window(window) {
 
 	for (const auto& data : m_Frames.data()) {
 		data->mRenderFence = TUnique<CFence>{fenceCreateInfo};
-		//mPresentFence = TUnique<CFence>{fenceCreateInfo};
-
 		data->mSwapchainSemaphore = TUnique<CSemaphore>{semaphoreCreateInfo};
-		//mRenderSemaphore = TUnique<CSemaphore>{semaphoreCreateInfo};
 	}
 
 	msgs("Pre Create");

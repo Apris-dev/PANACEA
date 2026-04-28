@@ -89,10 +89,7 @@ public:
 
     struct FrameData {
         TUnique<CSemaphore> mSwapchainSemaphore = nullptr;
-        TUnique<CSemaphore> mRenderSemaphore = nullptr;
-
         TUnique<CFence> mRenderFence = nullptr;
-        TUnique<CFence> mPresentFence = nullptr;
     };
 
     EXPORT CVRISwapchain(struct SDL_Window* window);
