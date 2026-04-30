@@ -312,7 +312,7 @@ void CVulkanRenderer::render(SRendererInfo& info) {
 		//finalize the command buffer (we can no longer add commands, but it can now be executed)
 		cmd->end();
 
-		CVRI::get()->getSwapchain()->submit(cmd, CVRI::get()->getQueue(EQueueType::GRAPHICS).mQueue, swapchainImage->mBindlessAddress);
+		CVRI::get()->getSwapchain()->submit(cmd, CVRI::get()->getQueue(EQueueType::GRAPHICS).mQueue, swapchainImage->getAddress());
 
 		// Tell tracy we just rendered a frame
 		FrameMark;

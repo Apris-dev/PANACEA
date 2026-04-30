@@ -57,7 +57,20 @@ using CDoubleBuffering = TBuffering<2>;
 struct SSwapchainImage : SVRIResource {
 
     SSwapchainImage() = default;
+
+	[[nodiscard]] VkImage get() const { return mImage; }
+	[[nodiscard]] VkImageView getView() const { return mImageView; }
+	[[nodiscard]] VkImageLayout getLayout() const { return mLayout; }
+	[[nodiscard]] uint32 getAddress() const { return mBindlessAddress; }
+
     EXPORT virtual std::function<void()> getDestroyer() override;
+
+    void updateLayout(const VkImageLayout inNewLayout) {
+        mLayout = inNewLayout;
+    }
+
+private:
+    EXPORT friend TUnique<SSwapchainImage> VRICreateSwapchainImage(const VkImage& inImage, const VkImageView& inImageView, uint32 inBindlessAddress);
 
     VkImage mImage = nullptr;
     VkImageView mImageView = nullptr;
@@ -65,6 +78,8 @@ struct SSwapchainImage : SVRIResource {
 
 	VkImageLayout mLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 };
+
+EXPORT TUnique<SSwapchainImage> VRICreateSwapchainImage(const VkImage& inImage, const VkImageView& inImageView, uint32 inBindlessAddress);
 
 struct SSwapchain final : TInitializable<const vkb::Result<vkb::Swapchain>&>, IDestroyable {
 

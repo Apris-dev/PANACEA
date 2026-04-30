@@ -326,80 +326,10 @@ TUnique<CPipelineLayout> VRICreatePipelineLayout(const uint32 setLayoutCount, co
 	return std::move(pipelineLayout);
 }
 
-TUnique<CRenderPass> VRICreateRenderPass(
-	uint32 attachmentCount,
-	const VkAttachmentDescription* attachments,
-	uint32 subpassCount,
-	const VkSubpassDescription* subpasses,
-	uint32 dependencyCount,
-	const VkSubpassDependency* dependencies,
-	const CRenderPass::Flags flags) {
-	VkRenderPassCreateInfo createInfo {
-		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-		.pNext = nullptr,
-		.flags = static_cast<VkRenderPassCreateFlags>(flags),
-		.attachmentCount = attachmentCount,
-		.pAttachments = attachments,
-		.subpassCount = subpassCount,
-		.pSubpasses = subpasses,
-		.dependencyCount = dependencyCount,
-		.pDependencies = dependencies
-   };
-	TUnique<CRenderPass> renderPass;
-	VK_CHECK(vkCreateRenderPass(CVRI::get()->getDevice()->device, &createInfo, nullptr, &renderPass->mRenderPass));
-	//m_Allocator->m_Resources.push(commandPool);
-	return std::move(renderPass);
-}
+TUnique<SPipeline> VRICreatePipeline(const SPipelineCreateInfo& inCreateInfo, CVertexAttributeArchive& inAttributes, const TUnique<CPipelineLayout>& inLayout) {
 
-TUnique<CSampler> VRICreateSampler(const VkSamplerCreateInfo& inCreateInfo) {
-	TUnique<CSampler> sampler;
-	VK_CHECK(vkCreateSampler(CVRI::get()->getDevice()->device, &inCreateInfo, nullptr, &sampler->mSampler));
-	//m_Allocator->m_Resources.push(commandPool);
-	return std::move(sampler);
-}
-
-TUnique<CSemaphore> VRICreateSemaphore(const CSemaphore::Flags flags) {
-	VkSemaphoreCreateInfo createInfo {
-		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-		.pNext = nullptr,
-		.flags = static_cast<VkSemaphoreCreateFlags>(flags)
-   };
-	TUnique<CSemaphore> semaphore;
-	VK_CHECK(vkCreateSemaphore(CVRI::get()->getDevice()->device, &createInfo, nullptr, &semaphore->mSemaphore));
-	//m_Allocator->m_Resources.push(commandPool);
-	return std::move(semaphore);
-}
-
-TUnique<CShaderModule> VRICreateShaderModule(size_t codeSize, const uint32* code, const CShaderModule::Flags flags) {
-	VkShaderModuleCreateInfo createInfo {
-		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-		.pNext = nullptr,
-		.flags = static_cast<VkShaderModuleCreateFlags>(flags),
-		.codeSize = codeSize,
-		.pCode = code
-   };
-	TUnique<CShaderModule> shaderModule;
-	VK_CHECK(vkCreateShaderModule(CVRI::get()->getDevice()->device, &createInfo, nullptr, &shaderModule->mShaderModule));
-	//m_Allocator->m_Resources.push(commandPool);
-	return std::move(shaderModule);
-}
-
-TUnique<CDescriptorSet> VRICreateDescriptorSet(const VkDescriptorPool descriptorPool, const uint32 descriptorSetCount, const VkDescriptorSetLayout* setLayouts) {
-	const VkDescriptorSetAllocateInfo createInfo {
-		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-		.pNext = nullptr,
-		.descriptorPool = descriptorPool,
-		.descriptorSetCount = descriptorSetCount,
-		.pSetLayouts = setLayouts
-   };
-	TUnique<CDescriptorSet> descriptorSet;
-	VK_CHECK(vkAllocateDescriptorSets(CVRI::get()->getDevice()->device, &createInfo, &descriptorSet->mDescriptorSet));
-	//m_Allocator->m_Resources.push(commandPool);
-	return std::move(descriptorSet);
-}
-
-SPipeline::SPipeline(const SPipelineCreateInfo& inCreateInfo, CVertexAttributeArchive& inAttributes, const TUnique<CPipelineLayout>& inLayout)
-: mLayout(inLayout.get()) {
+	TUnique<SPipeline> pipeline;
+	pipeline->mLayout = inLayout;
 
 	// Make viewport state from our stored viewport and scissor.
 	// At the moment we won't support multiple viewports or scissors
@@ -568,9 +498,11 @@ SPipeline::SPipeline(const SPipelineCreateInfo& inCreateInfo, CVertexAttributeAr
 		.layout = inLayout->get()
 	};
 
-	if (vkCreateGraphicsPipelines(CVRI::get()->getDevice()->device, VK_NULL_HANDLE, 1, &pipelineInfo,nullptr, &mPipeline) != VK_SUCCESS) {
+	if (vkCreateGraphicsPipelines(CVRI::get()->getDevice()->device, VK_NULL_HANDLE, 1, &pipelineInfo,nullptr, &pipeline->mPipeline) != VK_SUCCESS) {
 		msgs("Failed to create pipeline!");
 	}
+
+	return std::move(pipeline);
 }
 
 void SPipeline::bind(const VkCommandBuffer cmd, const VkPipelineBindPoint inBindPoint) const {
@@ -581,6 +513,78 @@ std::function<void()> SPipeline::getDestroyer() {
 	return [pipeline = mPipeline] {
 		vkDestroyPipeline(CVRI::get()->getDevice()->device, pipeline, nullptr);
 	};
+}
+
+TUnique<CRenderPass> VRICreateRenderPass(
+	uint32 attachmentCount,
+	const VkAttachmentDescription* attachments,
+	uint32 subpassCount,
+	const VkSubpassDescription* subpasses,
+	uint32 dependencyCount,
+	const VkSubpassDependency* dependencies,
+	const CRenderPass::Flags flags) {
+	VkRenderPassCreateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = static_cast<VkRenderPassCreateFlags>(flags),
+		.attachmentCount = attachmentCount,
+		.pAttachments = attachments,
+		.subpassCount = subpassCount,
+		.pSubpasses = subpasses,
+		.dependencyCount = dependencyCount,
+		.pDependencies = dependencies
+   };
+	TUnique<CRenderPass> renderPass;
+	VK_CHECK(vkCreateRenderPass(CVRI::get()->getDevice()->device, &createInfo, nullptr, &renderPass->mRenderPass));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(renderPass);
+}
+
+TUnique<CSampler> VRICreateSampler(const VkSamplerCreateInfo& inCreateInfo) {
+	TUnique<CSampler> sampler;
+	VK_CHECK(vkCreateSampler(CVRI::get()->getDevice()->device, &inCreateInfo, nullptr, &sampler->mSampler));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(sampler);
+}
+
+TUnique<CSemaphore> VRICreateSemaphore(const CSemaphore::Flags flags) {
+	VkSemaphoreCreateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = static_cast<VkSemaphoreCreateFlags>(flags)
+   };
+	TUnique<CSemaphore> semaphore;
+	VK_CHECK(vkCreateSemaphore(CVRI::get()->getDevice()->device, &createInfo, nullptr, &semaphore->mSemaphore));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(semaphore);
+}
+
+TUnique<CShaderModule> VRICreateShaderModule(size_t codeSize, const uint32* code, const CShaderModule::Flags flags) {
+	VkShaderModuleCreateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = static_cast<VkShaderModuleCreateFlags>(flags),
+		.codeSize = codeSize,
+		.pCode = code
+   };
+	TUnique<CShaderModule> shaderModule;
+	VK_CHECK(vkCreateShaderModule(CVRI::get()->getDevice()->device, &createInfo, nullptr, &shaderModule->mShaderModule));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(shaderModule);
+}
+
+TUnique<CDescriptorSet> VRICreateDescriptorSet(const VkDescriptorPool descriptorPool, const uint32 descriptorSetCount, const VkDescriptorSetLayout* setLayouts) {
+	const VkDescriptorSetAllocateInfo createInfo {
+		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+		.pNext = nullptr,
+		.descriptorPool = descriptorPool,
+		.descriptorSetCount = descriptorSetCount,
+		.pSetLayouts = setLayouts
+   };
+	TUnique<CDescriptorSet> descriptorSet;
+	VK_CHECK(vkAllocateDescriptorSets(CVRI::get()->getDevice()->device, &createInfo, &descriptorSet->mDescriptorSet));
+	//m_Allocator->m_Resources.push(commandPool);
+	return std::move(descriptorSet);
 }
 
 VkRenderingAttachmentInfo SRenderAttachment::get(const SVRIImage* inImage) const {

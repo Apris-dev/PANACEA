@@ -40,13 +40,13 @@ void CVRICommands::end() {
 	}
 	imageTransitions.clear();
 	for (const TFrail<SSwapchainImage>& image : swapchainTransitions) {
-		image->mLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		image->updateLayout(VK_IMAGE_LAYOUT_UNDEFINED);
 	}
 	swapchainTransitions.clear();
 }
 
 void CVRICommands::bindPipeline(const TFrail<SPipeline>& pipeline, const VkPipelineBindPoint inBindPoint) const {
-	vkCmdBindPipeline(cmd, inBindPoint, pipeline->mPipeline);
+	vkCmdBindPipeline(cmd, inBindPoint, pipeline->get());
 }
 
 void CVRICommands::bindDescriptorSets(const TFrail<CDescriptorSet>& descriptorSet, VkPipelineBindPoint inBindPoint, VkPipelineLayout inPipelineLayout, uint32 inFirstSet, uint32 inDescriptorSetCount) const {
@@ -112,7 +112,7 @@ void CVRICommands::blitToSwapchain(const TFrail<SVRIImage>& inSource, const TFra
 	blitRegion.dstSubresource.mipLevel = 0;
 
 	VkBlitImageInfo2 blitInfo { .sType = VK_STRUCTURE_TYPE_BLIT_IMAGE_INFO_2, .pNext = nullptr };
-	blitInfo.dstImage = inDestination->mImage;
+	blitInfo.dstImage = inDestination->get();
 	blitInfo.dstImageLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 	blitInfo.srcImage = inSource->mImage;
 	blitInfo.srcImageLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
@@ -173,7 +173,7 @@ void CVRICommands::transitionSwapchainImage(const TFrail<SSwapchainImage>& inIma
 	imageBarrier.dstStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
 	imageBarrier.dstAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT | VK_ACCESS_2_MEMORY_READ_BIT;
 
-	imageBarrier.oldLayout = inImage->mLayout;
+	imageBarrier.oldLayout = inImage->getLayout();
 	imageBarrier.newLayout = inLayout;
 
 	const VkImageAspectFlags aspectMask = (inLayout == VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
@@ -184,7 +184,7 @@ void CVRICommands::transitionSwapchainImage(const TFrail<SSwapchainImage>& inIma
 		.baseArrayLayer = 0,
 		.layerCount = VK_REMAINING_ARRAY_LAYERS
 	};
-	imageBarrier.image = inImage->mImage;
+	imageBarrier.image = inImage->get();
 
 	const VkDependencyInfo depInfo {
 		.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO,
@@ -195,7 +195,7 @@ void CVRICommands::transitionSwapchainImage(const TFrail<SSwapchainImage>& inIma
 
 	vkCmdPipelineBarrier2(cmd, &depInfo);
 
-	inImage->mLayout = inLayout;
+	inImage->updateLayout(inLayout);
 	swapchainTransitions.push(inImage);
 }
 

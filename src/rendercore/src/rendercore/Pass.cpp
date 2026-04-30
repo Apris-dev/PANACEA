@@ -42,14 +42,14 @@ bool CPass::hasSameRenderingInfo(const CPass* inOther) const {
 		getStencilAttachment() == inOther->getStencilAttachment();
 }
 
-void CPass::bindPipeline(const TFrail<CVRICommands>& cmd, SPipeline* inPipeline, const SPushConstants& inConstants) {
+void CPass::bindPipeline(const TFrail<CVRICommands>& cmd, const TFrail<SPipeline>& inPipeline, const SPushConstants& inConstants) {
 	// If the pipeline has changed, rebind pipeline data
 	//if (inPipeline != m_CurrentPipeline) {
 		m_CurrentPipeline = inPipeline;
 		cmd->bindPipeline(inPipeline, VK_PIPELINE_BIND_POINT_GRAPHICS);
-		cmd->bindDescriptorSets(CBindlessResources::getBindlessDescriptorSet(), VK_PIPELINE_BIND_POINT_GRAPHICS, inPipeline->mLayout->get(), 0, 1);
+		cmd->bindDescriptorSets(CBindlessResources::getBindlessDescriptorSet(), VK_PIPELINE_BIND_POINT_GRAPHICS, inPipeline->getLayout(), 0, 1);
 	//}
 
-	cmd->pushConstants(inPipeline->mLayout->get(), VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SPushConstants), inConstants.data());
+	cmd->pushConstants(inPipeline->getLayout(), VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SPushConstants), inConstants.data());
 
 }

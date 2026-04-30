@@ -67,7 +67,7 @@ void CEditorSpritePass::init(TFrail<CRenderer> inRenderer) {
 	attributes << VK_FORMAT_R32G32B32A32_SFLOAT;
 	attributes << VK_FORMAT_R32G32B32A32_SFLOAT;
 
-	textPipeline = TUnique<SPipeline>{createInfo, attributes, CBindlessResources::getBasicPipelineLayout()};
+	textPipeline = VRICreatePipeline(createInfo, attributes, CBindlessResources::getBasicPipelineLayout());
 
 	vert.destroy();
 	frag.destroy();
