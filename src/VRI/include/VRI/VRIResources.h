@@ -300,20 +300,23 @@ EXPORT TUnique<CPipelineLayout> VRICreatePipelineLayout(uint32 setLayoutCount, c
 //TODO: rename
 struct SPipeline : SVRIResource {
 
-	EXPORT SPipeline(const SPipelineCreateInfo& inCreateInfo, CVertexAttributeArchive& inAttributes, const TUnique<CPipelineLayout>& inLayout);
+	SPipeline() = default;
+
+	[[nodiscard]] VkPipeline get() const { return mPipeline; }
+
+	[[nodiscard]] VkPipelineLayout getLayout() const { return mLayout->get(); }
 
 	EXPORT void bind(VkCommandBuffer cmd, const VkPipelineBindPoint inBindPoint) const;
 
 	EXPORT virtual std::function<void()> getDestroyer() override;
 
-	VkPipeline operator->() const { return mPipeline; }
-
-	operator VkPipeline() const { return mPipeline; }
-
+private:
+	EXPORT friend TUnique<SPipeline> VRICreatePipeline(const SPipelineCreateInfo&, CVertexAttributeArchive&, const TUnique<CPipelineLayout>&);
 	VkPipeline mPipeline = nullptr;
-
-	CPipelineLayout* mLayout;
+	TFrail<CPipelineLayout> mLayout;
 };
+
+EXPORT TUnique<SPipeline> VRICreatePipeline(const SPipelineCreateInfo& inCreateInfo, CVertexAttributeArchive& inAttributes, const TUnique<CPipelineLayout>& inLayout);
 
 struct CRenderPass : SVRIResource {
 

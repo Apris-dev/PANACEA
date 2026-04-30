@@ -23,6 +23,14 @@ std::function<void()> SSwapchainImage::getDestroyer() {
 	};
 }
 
+TUnique<SSwapchainImage> VRICreateSwapchainImage(const VkImage& inImage, const VkImageView& inImageView, const uint32 inBindlessAddress) {
+	TUnique<SSwapchainImage> image;
+	image->mImage = inImage;
+	image->mImageView = inImageView;
+	image->mBindlessAddress = inBindlessAddress;
+	return std::move(image);
+}
+
 void SSwapchain::init(const vkb::Result<vkb::Swapchain>& inSwapchainBuilder) {
 	msgs("SSwapchain");
 
@@ -42,11 +50,7 @@ void SSwapchain::init(const vkb::Result<vkb::Swapchain>& inSwapchainBuilder) {
 	msgs("Swapchain Images");
 
 	mSwapchainImages.resize(images.size(), [&](const size_t i){
-		TUnique<SSwapchainImage> image{};
-		image->mImage = images[i];
-		image->mImageView = imageViews[i];
-		image->mBindlessAddress = i;
-		return image;
+		return VRICreateSwapchainImage(images[i], imageViews[i], i);
 	});
 }
 
