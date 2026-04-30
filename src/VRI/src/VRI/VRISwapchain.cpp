@@ -6,6 +6,8 @@
 #include "tracy/Tracy.hpp"
 #include "VRI/VRIAllocator.h"
 #include "VRI/VRICommands.h"
+#include "VRI/resources/Fence.h"
+#include "VRI/resources/Semaphore.h"
 
 #include "vulkan/vulkan_core.h"
 

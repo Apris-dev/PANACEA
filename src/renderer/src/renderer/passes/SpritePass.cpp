@@ -9,6 +9,9 @@
 #include "tracy/Tracy.hpp"
 #include "scene/viewport/Sprite.h"
 #include "VRI/VRICommands.h"
+#include "VRI/resources/Pipeline.h"
+#include "VRI/resources/Shader.h"
+#include "VRI/resources/VRIImage.h"
 
 #define SETTINGS_CATEGORY "Rendering/Sprite Pass"
 ADD_TEXT(Sprites, "Sprites: ");

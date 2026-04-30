@@ -14,6 +14,9 @@
 #include "tracy/Tracy.hpp"
 #include "scene/viewport/generic/Text.h"
 #include "VRI/VRICommands.h"
+#include "VRI/resources/Pipeline.h"
+#include "VRI/resources/Shader.h"
+#include "VRI/resources/VRIImage.h"
 
 void CEditorSpritePass::init(TFrail<CRenderer> inRenderer) {
 	CSpritePass::init(inRenderer);

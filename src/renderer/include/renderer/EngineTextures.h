@@ -3,6 +3,7 @@
 #include "rendercore/Renderer.h"
 #include "rendercore/VulkanResources.h"
 
+struct CSampler;
 class CMaterial;
 class CVulkanSwapchain;
 

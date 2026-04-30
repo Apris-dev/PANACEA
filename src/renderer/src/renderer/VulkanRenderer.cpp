@@ -24,6 +24,8 @@
 #include "VRI/VRIAllocator.h"
 #include "VRI/VRICommands.h"
 #include "VRI/VRISwapchain.h"
+#include "VRI/resources/Fence.h"
+#include "VRI/resources/VRIImage.h"
 
 #define SETTINGS_CATEGORY "Engine"
 ADD_COMMAND(bool, UseVsync, true);

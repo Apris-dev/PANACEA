@@ -9,6 +9,9 @@
 #include "scene/base/Scene.h"
 #include "renderer/object/StaticMeshObjectRenderer.h"
 #include "tracy/Tracy.hpp"
+#include "VRI/resources/Pipeline.h"
+#include "VRI/resources/Shader.h"
+#include "VRI/resources/VRIImage.h"
 
 #define SETTINGS_CATEGORY "Rendering"
 ADD_TEXT(Meshes, "Meshes: ");

@@ -3,8 +3,10 @@
 #include "sstl/Array.h"
 #include "sstl/Vector.h"
 
-#include "VRI/VRIResources.h"
+#include "VRI/resources/VRIResources.h"
 
+struct CFence;
+struct CSemaphore;
 class CVRICommands;
 
 // Forward declare vkb types

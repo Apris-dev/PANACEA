@@ -3,6 +3,7 @@
 #include "VRI/VRICommands.h"
 #include "VRI/BindlessResources.h"
 #include "rendercore/Material.h"
+#include "VRI/resources/Pipeline.h"
 
 void CPass::beginRendering(const TFrail<CVRICommands>& cmd, const Extent32u inExtent, const TFrail<SVRIImage>& inColorImage, const TFrail<SVRIImage>& inDepthImage, const TFrail<SVRIImage>& inStencilImage) const {
 	const VkRenderingAttachmentInfo colorAttachment = getColorAttachment().get(inColorImage.get());

@@ -2,9 +2,13 @@
 
 #include <vulkan/vulkan_core.h>
 
-#include "VRIResources.h"
+#include "VRI/resources/VRIResources.h"
 #include "sstl/ForwardList.h"
 
+struct CCommandPool;
+struct SPipeline;
+struct CDescriptorSet;
+struct SVRIBuffer;
 struct SSwapchainImage;
 
 // Commands used to interact with the vulkan driver

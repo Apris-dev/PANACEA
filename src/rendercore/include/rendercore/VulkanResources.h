@@ -8,7 +8,8 @@
 #include "basic/core/Common.h"
 #include "VRI/VRIAllocator.h"
 #include "VRI/VRICommands.h"
-#include "VRI/VRIResources.h"
+#include "VRI/resources/VRIBuffer.h"
+#include "VRI/resources/VRIResources.h"
 
 template <VmaMemoryUsage TMemoryUsage, VkBufferUsageFlags TBufferUsage>
 struct SPushableBuffer {

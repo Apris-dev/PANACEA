@@ -11,6 +11,9 @@
 
 #include "VRI/VRICommands.h"
 #include "VRI/VRISwapchain.h"
+#include "VRI/resources/DescriptorSet.h"
+#include "VRI/resources/Sampler.h"
+#include "VRI/resources/VRIImage.h"
 
 CEngineTextures::CEngineTextures(const TFrail<CRenderer>& renderer) {
 

@@ -4,7 +4,7 @@
 #include "sstl/Array.h"
 #include "sptr/Memory.h"
 #include "sstl/Queue.h"
-#include "VRI/VRIResources.h"
+#include "VRI/resources/VRIResources.h"
 
 struct VmaAllocator_T;
 

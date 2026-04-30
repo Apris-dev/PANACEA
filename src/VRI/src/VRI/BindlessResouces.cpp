@@ -1,6 +1,11 @@
-﻿#include <array>
+﻿#include "VRI/BindlessResources.h"
 
-#include "VRI/BindlessResources.h"
+#include <array>
+
+#include "VRI/resources/DescriptorPool.h"
+#include "VRI/resources/DescriptorSet.h"
+#include "VRI/resources/DescriptorSetLayout.h"
+#include "VRI/resources/PipelineLayout.h"
 
 TUnique<CBindlessResources>& CBindlessResources::get() {
 	static TUnique<CBindlessResources> bindlessResources{};

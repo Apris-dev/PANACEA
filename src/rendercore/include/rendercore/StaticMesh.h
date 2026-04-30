@@ -7,6 +7,8 @@
 #include "rendercore/Material.h"
 #include "rendercore/VulkanResources.h"
 
+struct SVRIMeshBuffer;
+
 struct SBounds {
 	Vector3f origin;
 	float sphereRadius;
@@ -45,7 +47,7 @@ struct SStaticMesh : public SObject {
 
 	SBounds bounds;
 	std::vector<Surface> surfaces;
-	TUnique<SVRIMeshBuffer> meshBuffers;
+	TUnique<SVRIMeshBuffer> meshBuffers = nullptr;
 
 	friend uint32 getHash(const SStaticMesh& inMesh) {
 		return getHash(inMesh.name);

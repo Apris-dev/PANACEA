@@ -20,6 +20,8 @@
 #include "renderer/EngineTextures.h"
 #include "scene/viewport/generic/Text.h"
 #include "VRI/VRICommands.h"
+#include "VRI/resources/DescriptorPool.h"
+#include "VRI/resources/VRIImage.h"
 
 void renderSceneUI(const SRendererInfo& info) {
 	if (ImGui::Begin("Scene")) {

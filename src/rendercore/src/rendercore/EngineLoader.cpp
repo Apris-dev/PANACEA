@@ -18,6 +18,8 @@
 
 #include "rendercore/StaticMesh.h"
 #include "rendercore/VulkanUtils.h"
+#include "VRI/resources/VRIImage.h"
+#include "VRI/resources/VRIMeshBuffer.h"
 
 constexpr static bool gUseOpenCL = false;
 

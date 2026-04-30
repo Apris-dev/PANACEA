@@ -2,7 +2,12 @@
 
 #include <limits>
 
-#include "VRI/VRIResources.h"
+#include "VRI/resources/VRIResources.h"
+
+struct CDescriptorSetLayout;
+struct CDescriptorSet;
+struct CPipelineLayout;
+struct CDescriptorPool;
 
 // More than 65535 textures should not be needed, but more than 255 might be.
 constexpr static uint32 gMaxTextures = (std::numeric_limits<uint16>::max)();

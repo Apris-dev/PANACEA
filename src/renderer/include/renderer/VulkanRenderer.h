@@ -9,6 +9,7 @@
 #include "rendercore/VulkanResources.h"
 #include "sutil/Threading.h"
 #include "VRI/VRISwapchain.h"
+#include "VRI/resources/CommandPool.h"
 
 class CVRICommands;
 class CEngineTextures;

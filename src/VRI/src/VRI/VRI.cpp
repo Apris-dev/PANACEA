@@ -6,7 +6,7 @@
 #include "SDL3/SDL_vulkan.h"
 #include "VRI/VRIAllocator.h"
 #include "VRI/VRISwapchain.h"
-#include "VRI/VRIResources.h"
+#include "VRI/resources/VRIResources.h"
 
 bool gIsVRIInitialized = false;
 

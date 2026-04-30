@@ -1,9 +1,14 @@
 ﻿#include "VRI/VRICommands.h"
 
 #include "VRI/VRI.h"
-#include "VRI/VRIResources.h"
+#include "VRI/resources/VRIResources.h"
 #include "tracy/Tracy.hpp"
 #include "VRI/VRISwapchain.h"
+#include "VRI/resources/CommandPool.h"
+#include "VRI/resources/DescriptorSet.h"
+#include "VRI/resources/Pipeline.h"
+#include "VRI/resources/VRIBuffer.h"
+#include "VRI/resources/VRIImage.h"
 
 CVRICommands::CVRICommands(const TFrail<CCommandPool>& inCmdPool) {
 	const VkCommandBufferAllocateInfo frameCmdAllocInfo {

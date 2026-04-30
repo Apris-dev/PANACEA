@@ -2,6 +2,8 @@
 
 #include "rendercore/Pass.h"
 
+struct CDescriptorPool;
+
 class CEngineUIPass final : public CPass {
 
 	REGISTER_PASS(CEngineUIPass, CPass)
