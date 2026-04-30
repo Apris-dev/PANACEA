@@ -109,22 +109,20 @@ std::string readShaderFile(const char* inFileName) {
 	CFileArchive<EOpenType::READ> file(inFileName);
 
 	if (!file.isOpen()) {
-		printf("I/O error. Cannot open shader file '%s'\n", inFileName);
-		return std::string();
+		msgs("I/O error. Cannot open shader file '{}'", inFileName);
+		return {};
 	}
 
 	std::string code = file.readFile(true);
 
 	// Process includes
-	while (code.find("#include ") != code.npos)
-	{
+	while (code.find("#include ") != std::string::npos) {
 		const auto pos = code.find("#include ");
-		const auto p1 = code.find("\"", pos);
-		const auto p2 = code.find("\"", p1 + 1);
-		if (p1 == code.npos || p2 == code.npos || p2 <= p1)
-		{
-			printf("Error while loading shader program: %s\n", code.c_str());
-			return std::string();
+		const auto p1 = code.find('\"', pos);
+		const auto p2 = code.find('\"', p1 + 1);
+		if (p1 == std::string::npos || p2 == std::string::npos || p2 <= p1) {
+			msgs("Error while loading shader program: {}", code.c_str());
+			return {};
 		}
 		const std::string name = code.substr(p1 + 1, p2 - p1 - 1);
 		const std::string include = readShaderFile((SPaths::get()->mShaderPath.string() + name.c_str()).c_str());
@@ -700,7 +698,7 @@ SVRIMeshBuffer::SVRIMeshBuffer(const size_t indicesSize, const size_t verticesSi
 	vertexBuffer = TUnique<SVRIBuffer>{verticesSize, VMA_MEMORY_USAGE_GPU_ONLY, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT};
 }
 
-SVRIImage::SVRIImage(const std::string& inDebugName, const VkExtent3D inExtent, const VkFormat inFormat, const VkImageUsageFlags inFlags, const VkImageAspectFlags inViewFlags, const uint32 inNumMips)
+SVRIImage::SVRIImage(const std::string_view& inDebugName, const VkExtent3D inExtent, const VkFormat inFormat, const VkImageUsageFlags inFlags, const VkImageAspectFlags inViewFlags, const uint32 inNumMips)
 : mName(inDebugName) {
 
 	mImageInfo = {
@@ -816,12 +814,12 @@ void generateMipmaps(const TFrail<CVRICommands>& cmd, const TFrail<SVRIImage>& i
         if (mip < mipLevels - 1) {
             VkImageBlit2 blitRegion { .sType = VK_STRUCTURE_TYPE_IMAGE_BLIT_2, .pNext = nullptr };
 
-            blitRegion.srcOffsets[1].x = extent.width;
-            blitRegion.srcOffsets[1].y = extent.height;
+            blitRegion.srcOffsets[1].x = static_cast<int32>(extent.width);
+            blitRegion.srcOffsets[1].y = static_cast<int32>(extent.height);
             blitRegion.srcOffsets[1].z = 1;
 
-            blitRegion.dstOffsets[1].x = halfSize.width;
-            blitRegion.dstOffsets[1].y = halfSize.height;
+            blitRegion.dstOffsets[1].x = static_cast<int32>(halfSize.width);
+            blitRegion.dstOffsets[1].y = static_cast<int32>(halfSize.height);
             blitRegion.dstOffsets[1].z = 1;
 
             blitRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -865,16 +863,18 @@ void SVRIImage::push(const TFrail<CVRICommands>& cmd, const void* inData, const 
 
 	cmd->transitionImage(this, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-	VkBufferImageCopy copyRegion = {};
-	copyRegion.bufferOffset = 0;
-	copyRegion.bufferRowLength = 0;
-	copyRegion.bufferImageHeight = 0;
-
-	copyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	copyRegion.imageSubresource.mipLevel = 0;
-	copyRegion.imageSubresource.baseArrayLayer = 0;
-	copyRegion.imageSubresource.layerCount = 1;
-	copyRegion.imageExtent = getExtent();
+	const VkBufferImageCopy copyRegion {
+		.bufferOffset = 0,
+		.bufferRowLength = 0,
+		.bufferImageHeight = 0,
+		.imageSubresource = {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.mipLevel = 0,
+			.baseArrayLayer = 0,
+			.layerCount = 1
+		},
+		.imageExtent = getExtent()
+	};
 
 	// copy the buffer into the image
 	cmd->copyBufferToImage(uploadBuffer, this, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, copyRegion);

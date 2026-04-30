@@ -562,7 +562,7 @@ struct SVRIMeshBuffer {
 
 struct SVRIImage : SVRIResource {
 
-	EXPORT SVRIImage(const std::string& inDebugName, VkExtent3D inExtent, VkFormat inFormat, VkImageUsageFlags inFlags = 0, VkImageAspectFlags inViewFlags = 0, uint32 inNumMips = 1);
+	EXPORT SVRIImage(const std::string_view& inDebugName, VkExtent3D inExtent, VkFormat inFormat, VkImageUsageFlags inFlags = 0, VkImageAspectFlags inViewFlags = 0, uint32 inNumMips = 1);
 
 	EXPORT virtual std::function<void()> getDestroyer() override;
 
