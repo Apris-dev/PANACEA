@@ -80,7 +80,7 @@ void CBindlessResources::init() {
 		mDescriptorSetLayout = VRICreateDescriptorSetLayout(
 			binding.size(),
 			binding.begin(),
-			CDescriptorSetLayout::UPDATE_AFTER_BIND_POOL
+			CDescriptorSetLayout::Flags::UPDATE_AFTER_BIND_POOL
 		);
 	}
 
