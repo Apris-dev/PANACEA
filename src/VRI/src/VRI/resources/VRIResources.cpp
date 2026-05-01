@@ -12,7 +12,7 @@
 
 SVRIResource::SVRIResource() {
 	asts(gIsVRIInitialized, "Cannot create VRI Resource before VRI Initialization!");
-		msgs("Attempted to allocate a resource.");
+	msgs("Attempted to allocate a resource.");
 	CVRI::get()->getAllocator()->pushResource(this);
 }
 

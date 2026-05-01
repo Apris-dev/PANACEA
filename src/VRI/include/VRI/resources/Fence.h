@@ -13,11 +13,7 @@ struct CFence : SVRIResource {
 
     [[nodiscard]] VkFence& get() { return mFence; }
 
-    virtual std::function<void()> getDestroyer() override {
-        return [fence = mFence] {
-            vkDestroyFence(CVRI::get()->getDevice()->device, fence, nullptr);
-        };
-    }
+    virtual std::function<void()> getDestroyer() override;
 
 private:
     EXPORT friend TUnique<CFence> VRICreateFence(Flags);

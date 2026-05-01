@@ -1,6 +1,9 @@
 #include "VRI/resources/VRIImage.h"
 
+#include <VkBootstrap.h>
+
 #include "VRI/BindlessResources.h"
+#include "VRI/VRI.h"
 #include "VRI/VRICommands.h"
 #include "VRI/resources/DescriptorSet.h"
 #include "VRI/resources/VRIBuffer.h"

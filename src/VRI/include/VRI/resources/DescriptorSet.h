@@ -1,6 +1,12 @@
 #pragma once
 
+#include "sstl/Vector.h"
 #include "VRI/resources/VRIResources.h"
+
+FORWARD_VK_TYPE(VkDescriptorSet);
+
+struct CDescriptorSetLayout;
+struct CDescriptorPool;
 
 struct CDescriptorSet : SVRIResource {
 
@@ -8,13 +14,13 @@ struct CDescriptorSet : SVRIResource {
 
     [[nodiscard]] VkDescriptorSet& get() { return mDescriptorSet; }
 
-    void bind(const VkCommandBuffer cmd, const VkPipelineBindPoint inBindPoint, const VkPipelineLayout inPipelineLayout, const uint32 inFirstSet, const uint32 inDescriptorSetCount) const {
+    /*void bind(const VkCommandBuffer cmd, const VkPipelineBindPoint inBindPoint, const VkPipelineLayout inPipelineLayout, const uint32 inFirstSet, const uint32 inDescriptorSetCount) const {
         vkCmdBindDescriptorSets(cmd, inBindPoint,inPipelineLayout, inFirstSet, inDescriptorSetCount, &mDescriptorSet, 0, nullptr);
-    }
+    }*/
 
 private:
-    EXPORT friend TUnique<CDescriptorSet> VRICreateDescriptorSet(VkDescriptorPool, uint32, const VkDescriptorSetLayout*);
+    EXPORT friend TUnique<CDescriptorSet> VRICreateDescriptorSet(const TFrail<CDescriptorPool>&, const TVector<TFrail<CDescriptorSetLayout>>&);
     VkDescriptorSet mDescriptorSet = nullptr;
 };
 
-EXPORT TUnique<CDescriptorSet> VRICreateDescriptorSet(VkDescriptorPool descriptorPool, uint32 descriptorSetCount, const VkDescriptorSetLayout* setLayouts);
+EXPORT TUnique<CDescriptorSet> VRICreateDescriptorSet(const TFrail<CDescriptorPool>& descriptorPool, const TVector<TFrail<CDescriptorSetLayout>>& inLayouts);

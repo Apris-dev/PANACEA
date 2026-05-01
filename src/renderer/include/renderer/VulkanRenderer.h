@@ -51,7 +51,7 @@ public:
 
 	struct FrameData {
 
-		EXPORT FrameData(uint32 queueFamilyIndex, CCommandPool::Flags flags = CCommandPool::NONE);
+		EXPORT FrameData(uint32 queueFamilyIndex, CCommandPool::Flags flags = CCommandPool::Flags::NONE);
 
 		EXPORT ~FrameData();
 

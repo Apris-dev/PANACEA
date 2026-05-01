@@ -338,23 +338,24 @@ void CEngineUIPass::init(const TFrail<CRenderer> inRenderer) {
 	// 1: create descriptor pool for IMGUI
 	//  the size of the pool is very oversize, but it's copied from imgui demo
 	//  itself.
-	VkDescriptorPoolSize poolSizes[] = { { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-		{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-		{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-		{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 } };
+	const TVector poolSizes{
+		CDescriptorPool::PoolSize{ CDescriptorPool::SAMPLER, 1000 },
+		CDescriptorPool::PoolSize{ CDescriptorPool::COMBINED_IMAGE_SAMPLER, 1000 },
+		CDescriptorPool::PoolSize{ CDescriptorPool::SAMPLED_IMAGE, 1000 },
+		CDescriptorPool::PoolSize{ CDescriptorPool::STORAGE_IMAGE, 1000 },
+		CDescriptorPool::PoolSize{ CDescriptorPool::UNIFORM_TEXEL_BUFFER, 1000 },
+		CDescriptorPool::PoolSize{ CDescriptorPool::STORAGE_TEXEL_BUFFER, 1000 },
+		CDescriptorPool::PoolSize{ CDescriptorPool::UNIFORM_BUFFER, 1000 },
+		CDescriptorPool::PoolSize{ CDescriptorPool::STORAGE_BUFFER, 1000 },
+		CDescriptorPool::PoolSize{ CDescriptorPool::UNIFORM_BUFFER_DYNAMIC, 1000 },
+		CDescriptorPool::PoolSize{ CDescriptorPool::STORAGE_BUFFER_DYNAMIC, 1000 },
+		CDescriptorPool::PoolSize{ CDescriptorPool::INPUT_ATTACHMENT, 1000 }
+	};
 
 	imguiPool = VRICreateDescriptorPool(
 		1000,
-		std::size(poolSizes),
 		poolSizes,
-		CDescriptorPool::FREE_DESCRIPTOR_SET
+		CDescriptorPool::Flags::FREE_DESCRIPTOR_SET
 	);
 
 	// this initializes imgui for Vulkan

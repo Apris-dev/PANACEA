@@ -1,11 +1,13 @@
 #include "VRI/resources/Shader.h"
 
 #include <combaseapi.h>
+#include <VkBootstrap.h>
 #include <wrl.h>
 #include <directx-dxc/dxcapi.h>
 
 #include "basic/core/Paths.h"
 #include "sarch/FileArchive.h"
+#include "VRI/VRI.h"
 
 using namespace Microsoft::WRL;
 

@@ -1,14 +1,11 @@
 ﻿#pragma once
 
-#include <forward_list>
-#include <vma/vk_mem_alloc.h>
 #include <vulkan/vulkan_core.h>
 
-#include "VkBootstrap.h"
-#include "VRI/VRI.h"
-
 #include "basic/core/Common.h"
-#include "sstl/Vector.h"
+
+#define FORWARD_VK_TYPE(x) \
+	typedef struct x##_T* x
 
 inline const char* string_VkResult(VkResult result) {
     switch (result) {

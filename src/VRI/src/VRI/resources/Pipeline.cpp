@@ -1,4 +1,8 @@
 #include "VRI/resources/Pipeline.h"
+
+#include <VkBootstrap.h>
+
+#include "VRI/VRI.h"
 #include "VRI/resources/PipelineLayout.h"
 
 TUnique<SPipeline> VRICreatePipeline(const SPipelineCreateInfo& inCreateInfo, CVertexAttributeArchive& inAttributes, const TUnique<CPipelineLayout>& inLayout) {

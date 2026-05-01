@@ -13,11 +13,7 @@ struct CSemaphore : SVRIResource {
 
     [[nodiscard]] VkSemaphore& get() { return mSemaphore; }
 
-    virtual std::function<void()> getDestroyer() override {
-        return [semaphore = mSemaphore] {
-            vkDestroySemaphore(CVRI::get()->getDevice()->device, semaphore, nullptr);
-        };
-    }
+    virtual std::function<void()> getDestroyer() override;
 
 private:
     EXPORT friend TUnique<CSemaphore> VRICreateSemaphore(Flags);

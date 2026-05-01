@@ -1,5 +1,7 @@
 ﻿#include "VRI/VRICommands.h"
 
+#include <VkBootstrap.h>
+
 #include "VRI/VRI.h"
 #include "VRI/resources/VRIResources.h"
 #include "tracy/Tracy.hpp"

@@ -6,6 +6,8 @@
 #include "sstl/Queue.h"
 #include "VRI/resources/VRIResources.h"
 
+#include "VRI/VRI.h"
+
 struct VmaAllocator_T;
 
 class CVRIAllocator {

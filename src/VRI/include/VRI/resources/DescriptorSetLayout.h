@@ -19,11 +19,7 @@ struct CDescriptorSetLayout : SVRIResource {
 
     [[nodiscard]] VkDescriptorSetLayout& get() { return mDescriptorSetLayout; }
 
-    virtual std::function<void()> getDestroyer() override {
-        return [descriptorSetLayout = mDescriptorSetLayout] {
-            vkDestroyDescriptorSetLayout(CVRI::get()->getDevice()->device, descriptorSetLayout, nullptr);
-        };
-    }
+    virtual std::function<void()> getDestroyer() override;
 
 private:
     EXPORT friend TUnique<CDescriptorSetLayout> VRICreateDescriptorSetLayout(uint32, const VkDescriptorSetLayoutBinding*, Flags);

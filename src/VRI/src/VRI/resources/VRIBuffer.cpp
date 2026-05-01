@@ -1,6 +1,9 @@
 #include "VRI/resources/VRIBuffer.h"
 
+#include <VkBootstrap.h>
+
 #include "VRI/BindlessResources.h"
+#include "VRI/VRI.h"
 #include "VRI/resources/DescriptorSet.h"
 
 SVRIBuffer::SVRIBuffer(const size_t inBufferSize, const VmaMemoryUsage inMemoryUsage, const VkBufferUsageFlags inBufferUsage)

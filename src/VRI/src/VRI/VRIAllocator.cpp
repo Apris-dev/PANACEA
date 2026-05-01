@@ -1,5 +1,8 @@
 ﻿#include "VRI/VRIAllocator.h"
 
+#include <VkBootstrap.h>
+#include <vma/vk_mem_alloc.h>
+
 CVRIAllocator::CVRIAllocator() {
     const VmaAllocatorCreateInfo allocatorInfo {
         .flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT,

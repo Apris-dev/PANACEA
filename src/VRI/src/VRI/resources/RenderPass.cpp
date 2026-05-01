@@ -1,5 +1,9 @@
 #include "VRI/resources/RenderPass.h"
 
+#include <VkBootstrap.h>
+
+#include "VRI/VRI.h"
+
 TUnique<CRenderPass> VRICreateRenderPass(
     uint32 attachmentCount,
     const VkAttachmentDescription* attachments,
@@ -23,4 +27,10 @@ TUnique<CRenderPass> VRICreateRenderPass(
     VK_CHECK(vkCreateRenderPass(CVRI::get()->getDevice()->device, &createInfo, nullptr, &renderPass->mRenderPass));
     //m_Allocator->m_Resources.push(commandPool);
     return std::move(renderPass);
+}
+
+std::function<void()> CRenderPass::getDestroyer() {
+    return [renderPass = mRenderPass] {
+        vkDestroyRenderPass(CVRI::get()->getDevice()->device, renderPass, nullptr);
+    };
 }

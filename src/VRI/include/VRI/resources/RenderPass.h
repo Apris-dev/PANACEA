@@ -14,11 +14,7 @@ struct CRenderPass : SVRIResource {
 
     [[nodiscard]] VkRenderPass& get() { return mRenderPass; }
 
-    virtual std::function<void()> getDestroyer() override {
-        return [renderPass = mRenderPass] {
-            vkDestroyRenderPass(CVRI::get()->getDevice()->device, renderPass, nullptr);
-        };
-    }
+    virtual std::function<void()> getDestroyer() override;
 
 private:
     EXPORT friend TUnique<CRenderPass> VRICreateRenderPass(

@@ -13,11 +13,7 @@ struct CPipelineLayout : SVRIResource {
 
     [[nodiscard]] VkPipelineLayout get() const { return mPipelineLayout; }
 
-    virtual std::function<void()> getDestroyer() override {
-        return [pipelineLayout = mPipelineLayout] {
-            vkDestroyPipelineLayout(CVRI::get()->getDevice()->device, pipelineLayout, nullptr);
-        };
-    }
+    virtual std::function<void()> getDestroyer() override;
 
 private:
     EXPORT friend TUnique<CPipelineLayout> VRICreatePipelineLayout(uint32, const VkDescriptorSetLayout*, uint32, const VkPushConstantRange*, Flags);

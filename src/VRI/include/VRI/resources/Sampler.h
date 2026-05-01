@@ -8,11 +8,7 @@ struct CSampler : SVRIResource {
 
     [[nodiscard]] VkSampler& get() { return mSampler; }
 
-    virtual std::function<void()> getDestroyer() override {
-        return [sampler = mSampler] {
-            vkDestroySampler(CVRI::get()->getDevice()->device, sampler, nullptr);
-        };
-    }
+    virtual std::function<void()> getDestroyer() override;
 
 private:
     EXPORT friend TUnique<CSampler> VRICreateSampler(const VkSamplerCreateInfo&);

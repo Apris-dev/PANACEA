@@ -101,7 +101,7 @@ void CVulkanRenderer::init() {
 		// We also want the pool to allow for resetting of individual command buffers
 		mFrameData.data().resize([&](size_t) {
 			return TUnique<FrameData>(
-				CVRI::get()->getQueue(EQueueType::GRAPHICS).mFamily, CCommandPool::RESET_COMMAND_BUFFER
+				CVRI::get()->getQueue(EQueueType::GRAPHICS).mFamily, CCommandPool::Flags::RESET_COMMAND_BUFFER
 			);
 		});
 	}
