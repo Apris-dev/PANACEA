@@ -44,7 +44,7 @@ void CBindlessResources::init() {
 
 		const auto inputFlags = {flags, flags, flags, flags};
 
-		auto binding = {
+		const auto binding = {
 			VkDescriptorSetLayoutBinding {
 				.binding = gTextureBinding,
 				.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
