@@ -7,7 +7,7 @@
 #include "VRI/resources/DescriptorPool.h"
 #include "VRI/resources/DescriptorSetLayout.h"
 
-TUnique<CDescriptorSet> VRICreateDescriptorSet(const TFrail<CDescriptorPool>& descriptorPool, const TVector<TFrail<CDescriptorSetLayout>>& inLayouts) {
+TUnique<CDescriptorSet> VRICreateDescriptorSet(const TFrail<CDescriptorPool>& descriptorPool, const TVector<TFrail<CDescriptorSetLayout>>& inLayouts, const VkDescriptorSetVariableDescriptorCountAllocateInfoEXT& allocateInfo) {
     TVector<VkDescriptorSetLayout> setLayouts;
     setLayouts.reserve(inLayouts.getSize());
 
@@ -17,7 +17,7 @@ TUnique<CDescriptorSet> VRICreateDescriptorSet(const TFrail<CDescriptorPool>& de
 
     const VkDescriptorSetAllocateInfo createInfo {
         .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-        .pNext = nullptr,
+        .pNext = &allocateInfo,
         .descriptorPool = descriptorPool->get(),
         .descriptorSetCount = static_cast<uint32>(setLayouts.getSize()),
         .pSetLayouts = setLayouts.data()

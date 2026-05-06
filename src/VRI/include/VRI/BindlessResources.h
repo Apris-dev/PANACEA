@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include <limits>
-
 #include "VRI/resources/VRIResources.h"
+
+struct VkDescriptorPool_T;
 
 struct CDescriptorSetLayout;
 struct CDescriptorSet;
@@ -20,6 +20,19 @@ struct CDescriptorPool;
  *  - Non-Runtime Textures, like the error material (index 0)
  */
 
+struct SSetIndexPool {
+	constexpr static uint32 gMaxSamplers = 256;
+	constexpr static uint32 gMaxUniformBuffers = 4096;
+	constexpr static uint32 gMaxStorageBuffers = 256;
+	VkDescriptorPool mDescriptorPool = nullptr;
+	VkDescriptorSetLayout mDescriptorSetLayout = nullptr;
+	VkDescriptorSet mDescriptorSet = nullptr;
+
+	EXPORT void init();
+	EXPORT void destroy() const;
+};
+
+
 /*
  * Fixed Size Pool (FSP)
  * ----------------------------------------------------
@@ -28,6 +41,10 @@ struct CDescriptorPool;
  *  - Runtime Textures
  *  - Texture Streaming mipmap Transitions
  */
+
+struct SFixedSizePool {
+	constexpr static uint32 gMaxTextures = 65536;
+};
 
 /*
  * Volatile Lifetime Pool (VLP)
@@ -43,30 +60,9 @@ struct CDescriptorPool;
 // FSP - Known Sizes
 // VLP - Unknown lifetimes or sizes
 
-// 65536 is a good number of textures to allow, as more would be overkill
-// Fits within a 16 bit value
-constexpr static uint32 gMaxTextures = 65536;
-// (Rough memory impact of 65536 * 32B = ~2.1MB)
-// This is high because we want a large # of textures
 
-// There are very few types of samplers, so 256 is generous
-// Since samplers are essentially static, they do not need to be in push constants
-constexpr static uint32 gMaxSamplers = 256;
+
 // (Rough memory impact of 256 * 32B/64B = 8.192KB/16.384KB)
-
-// Uniform buffers tend to be fast to access but very small
-// OpenGL spec states that uniform buffers guarantee up to 16 KB per buffer
-// If per material data is wanted, 4096 is a good number to have
-// Fits within an 12 bit value
-constexpr static uint32 gMaxUniformBuffers = 4096;
-// (Rough memory impact of 4096 * 16B/32B = 65.5KB/131.1KB)
-
-// Shader Storage Buffers tend to be slower but larger
-// OpenGL spec states that SSBOs guarantee up to 128 MB, but can be larger
-// OpenGL spec also states only 8 SSBOs are guaranteed per shader stage (not true on modern hardware, good to know about however)
-// Fits within a 8 bit balue
-constexpr static uint32 gMaxStorageBuffers = 256;
-// (Rough memory impact of 256 * 32B = 8.192KB)
 
 static uint32 gTextureBinding = 0;
 static uint32 gSamplerBinding = 1;
@@ -87,16 +83,8 @@ public:
 
 	EXPORT virtual void destroy();
 
-	static TUnique<CDescriptorPool>& getBindlessDescriptorPool() {
-		return get()->mDescriptorPool;
-	}
-
 	static TUnique<CPipelineLayout>& getBasicPipelineLayout() {
 		return get()->mPipelineLayout;
-	}
-
-	static TUnique<CDescriptorSetLayout>& getBindlessDescriptorSetLayout() {
-		return get()->mDescriptorSetLayout;
 	}
 
 	static TUnique<CDescriptorSet>& getBindlessDescriptorSet() {

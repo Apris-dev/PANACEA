@@ -19,8 +19,8 @@ struct CDescriptorSet : SVRIResource {
     }*/
 
 private:
-    EXPORT friend TUnique<CDescriptorSet> VRICreateDescriptorSet(const TFrail<CDescriptorPool>&, const TVector<TFrail<CDescriptorSetLayout>>&);
+    EXPORT friend TUnique<CDescriptorSet> VRICreateDescriptorSet(const TFrail<CDescriptorPool>&, const TVector<TFrail<CDescriptorSetLayout>>&, const VkDescriptorSetVariableDescriptorCountAllocateInfoEXT&);
     VkDescriptorSet mDescriptorSet = nullptr;
 };
 
-EXPORT TUnique<CDescriptorSet> VRICreateDescriptorSet(const TFrail<CDescriptorPool>& descriptorPool, const TVector<TFrail<CDescriptorSetLayout>>& inLayouts);
+EXPORT TUnique<CDescriptorSet> VRICreateDescriptorSet(const TFrail<CDescriptorPool>& descriptorPool, const TVector<TFrail<CDescriptorSetLayout>>& inLayouts, const VkDescriptorSetVariableDescriptorCountAllocateInfoEXT& allocateInfo);

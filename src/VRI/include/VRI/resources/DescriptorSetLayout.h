@@ -31,8 +31,8 @@ struct CDescriptorSetLayout : SVRIResource {
     virtual std::function<void()> getDestroyer() override;
 
 private:
-    EXPORT friend TUnique<CDescriptorSetLayout> VRICreateDescriptorSetLayout(uint32, const VkDescriptorSetLayoutBinding*, Flags);
+    EXPORT friend TUnique<CDescriptorSetLayout> VRICreateDescriptorSetLayout(uint32, const VkDescriptorSetLayoutBinding*, const VkDescriptorSetLayoutBindingFlagsCreateInfo&, Flags);
     VkDescriptorSetLayout mDescriptorSetLayout = nullptr;
 };
 
-EXPORT TUnique<CDescriptorSetLayout> VRICreateDescriptorSetLayout(uint32 bindingCount, const VkDescriptorSetLayoutBinding* bindings, CDescriptorSetLayout::Flags flags = CDescriptorSetLayout::Flags::NONE);
+EXPORT TUnique<CDescriptorSetLayout> VRICreateDescriptorSetLayout(uint32 bindingCount, const VkDescriptorSetLayoutBinding* bindings, const VkDescriptorSetLayoutBindingFlagsCreateInfo& bindingInfo, CDescriptorSetLayout::Flags flags = CDescriptorSetLayout::Flags::NONE);

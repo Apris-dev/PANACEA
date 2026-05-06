@@ -24,10 +24,10 @@ VkDescriptorSetLayoutCreateFlags convertToVkCreateFlags(const CDescriptorSetLayo
     }
 }
 
-TUnique<CDescriptorSetLayout> VRICreateDescriptorSetLayout(const uint32 bindingCount, const VkDescriptorSetLayoutBinding* bindings, const CDescriptorSetLayout::Flags flags) {
+TUnique<CDescriptorSetLayout> VRICreateDescriptorSetLayout(const uint32 bindingCount, const VkDescriptorSetLayoutBinding* bindings, const VkDescriptorSetLayoutBindingFlagsCreateInfo& bindingInfo, const CDescriptorSetLayout::Flags flags) {
     const VkDescriptorSetLayoutCreateInfo createInfo {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-        .pNext = nullptr,
+        .pNext = &bindingInfo,
         .flags = convertToVkCreateFlags(flags),
         .bindingCount = bindingCount,
         .pBindings = bindings
