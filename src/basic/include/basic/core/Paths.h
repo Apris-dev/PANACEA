@@ -4,6 +4,7 @@
 #include <string>
 
 #include "Singleton.h"
+#include "basic/core/Class.h"
 
 struct SPaths : SObject {
 

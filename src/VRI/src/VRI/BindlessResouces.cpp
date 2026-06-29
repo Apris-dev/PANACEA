@@ -4,11 +4,13 @@
 #include <array>
 #include <VkBootstrap.h>
 
+#include "sstl/Array.h"
 #include "VRI/VRI.h"
 #include "VRI/resources/DescriptorPool.h"
 #include "VRI/resources/DescriptorSet.h"
 #include "VRI/resources/DescriptorSetLayout.h"
 #include "VRI/resources/PipelineLayout.h"
+#include "VRI/resources/Sampler.h"
 
 TUnique<CBindlessResources>& CBindlessResources::get() {
 	static TUnique<CBindlessResources> bindlessResources{};
@@ -16,274 +18,170 @@ TUnique<CBindlessResources>& CBindlessResources::get() {
 }
 
 //TODO: permanent move for these
-struct SPushConstants : std::array<Vector4f, 8> {
-	SPushConstants() : array() {
-		fill(Vector4f(0.f));
+struct SPushConstants : TArray<Vector4f, 8> {
+	SPushConstants() {
+		resize([](size_t) { return Vector4f(0.f); });
 	}
 };
 
-struct SDescriptor {
+// TODO: Assumes flags (for now)
+void SDescriptor::init(const TSpan<Pool>& pools, const DescriptorFlags inFlags) {
+	VkDescriptorPoolCreateFlags poolCreateFlags = 0;
+	VkDescriptorBindingFlags bindingFlags = 0;
+	VkDescriptorSetLayoutCreateFlags setLayoutCreateFlags = 0;
 
-	//TODO: look into PUSH_DESCRIPTOR for an entirely different system which does not outlive the command buffer
-	enum Flags {
-		CAN_FREE_SETS = 0x00000002, // Needs free, Implies VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT
-		CAN_UPDATE_SETS = 0x00000008, // descriptors updated while set is bound, implies UPDATE_AFTER_BIND
-		CAN_HAVE_EMPTY_SLOTS = 0x00000010, // not all slots need to be populated
-		PUSH_INLINE = 0x00000020 // no pool needed, recorded into command buffer (PUSH_DESCRIPTOR)
-	};
-	typedef uint32 DescriptorFlags;
-
-	struct Pool {
-		enum { // Type Alias
-			SAMPLER = VK_DESCRIPTOR_TYPE_SAMPLER,
-			SAMPLED_IMAGE = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-			UNIFORM_BUFFER = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			STORAGE_BUFFER = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER
-		} type;
-		uint32 count;
-	};
-
-	VkDescriptorPool mDescriptorPool = nullptr;
-	VkDescriptorSetLayout mDescriptorSetLayout = nullptr;
-	VkDescriptorSet mDescriptorSet = nullptr;
-
-	// TODO: Assumes flags (for now)
-	void init(const TVector<Pool>& pools, const DescriptorFlags inFlags) {
-		VkDescriptorPoolCreateFlags poolCreateFlags = 0;
-		VkDescriptorBindingFlags bindingFlags = 0;
-		VkDescriptorSetLayoutCreateFlags setLayoutCreateFlags = 0;
-
-		// Define Flags Early
-		{
-			if (inFlags & CAN_FREE_SETS) {
-				poolCreateFlags |= VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-			}
-			if (inFlags & CAN_UPDATE_SETS) {
-				poolCreateFlags    |= VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
-				bindingFlags |= VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT;
-				setLayoutCreateFlags  |= VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT;
-			}
-			if (inFlags & CAN_HAVE_EMPTY_SLOTS) {
-				bindingFlags |= VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT;
-			}
-			if (inFlags & PUSH_INLINE) {
-				setLayoutCreateFlags |= VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR;
-			}
+	// Define Flags Early
+	{
+		if (inFlags & CAN_FREE_SETS) {
+			poolCreateFlags |= VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 		}
+		if (inFlags & CAN_UPDATE_SETS) {
+			poolCreateFlags    |= VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
+			bindingFlags |= VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT;
+			setLayoutCreateFlags  |= VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT;
+		}
+		if (inFlags & CAN_HAVE_EMPTY_SLOTS) {
+			bindingFlags |= VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT;
+		}
+		if (inFlags & PUSH_INLINE) {
+			setLayoutCreateFlags |= VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR;
+		}
+	}
 
-		TVector<VkDescriptorPoolSize> poolSizes;
-		poolSizes.reserve(pools.getSize());
+	TVector<VkDescriptorPoolSize> poolSizes;
+	poolSizes.reserve(pools.getSize());
 
-		TVector<VkDescriptorSetLayoutBinding> bindings;
-		bindings.reserve(pools.getSize());
+	TVector<VkDescriptorSetLayoutBinding> bindings;
+	bindings.reserve(pools.getSize());
 
-		// Populate pool sizes and bindings first
-		{
-			uint32 currentBinding = 0;
-			for (const auto& [type, count] : pools) {
-				poolSizes.push(VkDescriptorPoolSize{
-					.type = static_cast<VkDescriptorType>(type),
-					.descriptorCount = count
-				});
+	// Populate pool sizes and bindings first
+	{
+		for (const auto& pool : pools) {
 
-				bindings.push(VkDescriptorSetLayoutBinding{
-					.binding = currentBinding++,
-					.descriptorType = static_cast<VkDescriptorType>(type),
-					.descriptorCount = count,
-					.stageFlags = VK_SHADER_STAGE_ALL
-				});
+			VkDescriptorType vkType = VK_DESCRIPTOR_TYPE_MAX_ENUM;
+
+			switch (pool.get().type) {
+			case Pool::SAMPLER:
+				vkType = VK_DESCRIPTOR_TYPE_SAMPLER;
+				break;
+			case Pool::SAMPLED_IMAGE:
+				vkType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+				break;
+			case Pool::UNIFORM_BUFFER:
+				vkType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				break;
+			case Pool::STORAGE_BUFFER:
+				vkType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+				break;
 			}
-		}
 
-		// Create Descriptor Pool
-		{
-			const VkDescriptorPoolCreateInfo createInfo {
-				.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = poolCreateFlags,
-				.maxSets = 1,
-				.poolSizeCount = static_cast<uint32>(poolSizes.getSize()),
-				.pPoolSizes = poolSizes.data(),
-			};
-
-			vkCreateDescriptorPool(CVRI::get()->getDevice()->device, &createInfo, nullptr, &mDescriptorPool);
-		}
-
-		{
-			// Add input flags as vector of pools size
-			TVector<uint32> inputFlags;
-			inputFlags.resize(pools.getSize(), [&bindingFlags](size_t) {
-				return bindingFlags;
+			poolSizes.push(VkDescriptorPoolSize{
+				.type = vkType,
+				.descriptorCount = pool.get().count
 			});
 
-			const auto flagInfo = VkDescriptorSetLayoutBindingFlagsCreateInfo {
-				.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
-				.bindingCount = static_cast<uint32>(inputFlags.getSize()),
-				.pBindingFlags = inputFlags.data(),
-			};
-
-			const VkDescriptorSetLayoutCreateInfo createInfo {
-				.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-				.pNext = &flagInfo,
-				.flags = setLayoutCreateFlags,
-				.bindingCount = static_cast<uint32>(bindings.getSize()),
-				.pBindings = bindings.data()
-			};
-
-			vkCreateDescriptorSetLayout(CVRI::get()->getDevice()->device, &createInfo, nullptr, &mDescriptorSetLayout);
-		}
-
-		{
-			const TVector setLayouts { mDescriptorSetLayout };
-
-			const VkDescriptorSetAllocateInfo createInfo {
-				.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-				.pNext = nullptr,
-				.descriptorPool = mDescriptorPool,
-				.descriptorSetCount = static_cast<uint32>(setLayouts.getSize()),
-				.pSetLayouts = setLayouts.data()
-		   };
-
-			vkAllocateDescriptorSets(CVRI::get()->getDevice()->device, &createInfo, &mDescriptorSet);
+			bindings.push(VkDescriptorSetLayoutBinding{
+				.binding = pool.get().binding,
+				.descriptorType = vkType,
+				.descriptorCount = pool.get().count,
+				.stageFlags = VK_SHADER_STAGE_ALL
+			});
 		}
 	}
-};
 
-void SSetIndexPool::init() {
-
+	// Create Descriptor Pool
 	{
-		SDescriptor SIP;
-
-		const TVector pools {
-			SDescriptor::Pool{SDescriptor::Pool::SAMPLER, gMaxSamplers},
-			SDescriptor::Pool{SDescriptor::Pool::UNIFORM_BUFFER, gMaxUniformBuffers},
-			SDescriptor::Pool{SDescriptor::Pool::STORAGE_BUFFER, gMaxStorageBuffers}
+		const VkDescriptorPoolCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = poolCreateFlags,
+			.maxSets = 1,
+			.poolSizeCount = static_cast<uint32>(poolSizes.getSize()),
+			.pPoolSizes = poolSizes.data(),
 		};
 
-		SIP.init(pools,
-			SDescriptor::CAN_HAVE_EMPTY_SLOTS
-		);
+		vkCreateDescriptorPool(CVRI::get()->getDevice()->device, &createInfo, nullptr, &mDescriptorPool);
 	}
 
 	{
-		SDescriptor FSP;
+		// Add input flags as vector of pools size
+		TVector<uint32> inputFlags;
+		inputFlags.resize(pools.getSize(), [&bindingFlags](size_t) {
+			return bindingFlags;
+		});
 
-		const TVector pools {
-			SDescriptor::Pool{SDescriptor::Pool::SAMPLED_IMAGE, 65535} //2^16
+		const auto flagInfo = VkDescriptorSetLayoutBindingFlagsCreateInfo {
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
+			.bindingCount = static_cast<uint32>(inputFlags.getSize()),
+			.pBindingFlags = inputFlags.data(),
 		};
 
-		FSP.init(pools,
-			SDescriptor::CAN_UPDATE_SETS | SDescriptor::CAN_HAVE_EMPTY_SLOTS
-		);
+		const VkDescriptorSetLayoutCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+			.pNext = &flagInfo,
+			.flags = setLayoutCreateFlags,
+			.bindingCount = static_cast<uint32>(bindings.getSize()),
+			.pBindings = bindings.data()
+		};
+
+		vkCreateDescriptorSetLayout(CVRI::get()->getDevice()->device, &createInfo, nullptr, &mDescriptorSetLayout);
 	}
 
-	// Doesn't work like this but whatever
 	{
-		SDescriptor VLP;
+		const TVector setLayouts { mDescriptorSetLayout };
 
-		const TVector pools {
-			SDescriptor::Pool{SDescriptor::Pool::SAMPLED_IMAGE, 65535} //2^16
-		};
+		const VkDescriptorSetAllocateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+			.pNext = nullptr,
+			.descriptorPool = mDescriptorPool,
+			.descriptorSetCount = static_cast<uint32>(setLayouts.getSize()),
+			.pSetLayouts = setLayouts.data()
+	    };
 
-		VLP.init(pools,
-			SDescriptor::CAN_FREE_SETS | SDescriptor::CAN_HAVE_EMPTY_SLOTS
-		);
-	}
-
-	// Doesn't work like this but whatever
-	{
-		SDescriptor Push;
-
-		const TVector pools {
-			SDescriptor::Pool{SDescriptor::Pool::SAMPLED_IMAGE, 65535} //2^16
-		};
-
-		Push.init(pools,
-			SDescriptor::PUSH_INLINE
-		);
+		vkAllocateDescriptorSets(CVRI::get()->getDevice()->device, &createInfo, &mDescriptorSet);
 	}
 }
 
-void SSetIndexPool::destroy() const {
+void SDescriptor::destroy() const {
 	vkDestroyDescriptorSetLayout(CVRI::get()->getDevice()->device, mDescriptorSetLayout, nullptr);
 	vkDestroyDescriptorPool(CVRI::get()->getDevice()->device, mDescriptorPool, nullptr);
 }
 
+
+
+TUnique<CSampler> SSetIndexPool::createSampler(const std::string_view inName, const VkSamplerCreateInfo& inCreateInfo) {
+	SSetIndexPool& setIndexPool = CBindlessResources::get()->setIndexPool;
+
+	TUnique<CSampler> sampler = VRICreateSampler(inCreateInfo);
+
+	const auto imageDescriptorInfo = VkDescriptorImageInfo{
+		.sampler = sampler->get()
+	};
+
+	// Add samplers to tracking
+	const uint32 currentSampler = setIndexPool.samplerIndexes.push(std::string(inName));
+
+	const auto writeSet = VkWriteDescriptorSet{
+		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+		.dstSet = setIndexPool.descriptor.mDescriptorSet,
+		.dstBinding = gSamplerBinding,
+		.dstArrayElement = currentSampler,
+		.descriptorCount = 1,
+		.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
+		.pImageInfo = &imageDescriptorInfo,
+	};
+
+	const auto sets = {writeSet};
+
+	vkUpdateDescriptorSets(CVRI::get()->getDevice()->device, static_cast<uint32>(sets.size()), sets.begin(), 0, nullptr);
+
+	return std::move(sampler);
+}
+
 //TODO: various uses of device singleton, need to remove
 void CBindlessResources::init() {
-	// Create Descriptor pool
-	/*{
-		const TVector poolSizes {
-			CDescriptorPool::PoolSize{ CDescriptorPool::SAMPLED_IMAGE, gMaxTextures},
-			CDescriptorPool::PoolSize{ CDescriptorPool::SAMPLER, gMaxSamplers},
-			CDescriptorPool::PoolSize{ CDescriptorPool::UNIFORM_BUFFER, gMaxUniformBuffers},
-			CDescriptorPool::PoolSize{ CDescriptorPool::STORAGE_BUFFER, gMaxStorageBuffers},
-		};
-
-		mDescriptorPool = VRICreateDescriptorPool(
-			gMaxTextures + gMaxSamplers + gMaxUniformBuffers + gMaxStorageBuffers,
-			poolSizes,
-			CDescriptorPool::Flags::UPDATE_AFTER_BIND
-		);
-	}
-
-	// Create Descriptor Set layout
-	{
-		constexpr VkDescriptorBindingFlags flags = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT; //VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT
-
-		const auto inputFlags = {flags, flags, flags, flags};
-
-		const auto binding = {
-			VkDescriptorSetLayoutBinding {
-				.binding = gTextureBinding,
-				.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-				.descriptorCount = gMaxTextures,
-				.stageFlags = VK_SHADER_STAGE_ALL,
-			},
-			VkDescriptorSetLayoutBinding {
-				.binding = gSamplerBinding,
-				.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
-				.descriptorCount = gMaxSamplers,
-				.stageFlags = VK_SHADER_STAGE_ALL,
-			},
-			VkDescriptorSetLayoutBinding {
-				.binding = gUBOBinding,
-				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				.descriptorCount = gMaxUniformBuffers,
-				.stageFlags = VK_SHADER_STAGE_ALL,
-			},
-			VkDescriptorSetLayoutBinding {
-				.binding = gSSBOBinding,
-				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-				.descriptorCount = gMaxStorageBuffers,
-				.stageFlags = VK_SHADER_STAGE_ALL,
-			}
-		};
-
-		const auto flagInfo = VkDescriptorSetLayoutBindingFlagsCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
-			.bindingCount = (uint32)inputFlags.size(),
-			.pBindingFlags = inputFlags.begin(),
-		};
-
-		mDescriptorSetLayout = VRICreateDescriptorSetLayout(
-			binding.size(),
-			binding.begin(),
-			CDescriptorSetLayout::Flags::UPDATE_AFTER_BIND_POOL
-		);
-	}
-
-	{
-		//TODO: not sure what is used for?
-		constexpr uint32 maxBinding = gMaxStorageBuffers - 1;
-		VkDescriptorSetVariableDescriptorCountAllocateInfoEXT countInfo {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT,
-			.descriptorSetCount = 1,
-			.pDescriptorCounts = &maxBinding
-		};
-
-		mDescriptorSet = VRICreateDescriptorSet(mDescriptorPool, { mDescriptorSetLayout });
-	}
+	setIndexPool.init();
+	fixedSizePool.init();
 
 	// Create Basic Pipeline Layout
 	// This includes the 8 Vector4f Push Constants (128 bytes) and the global DescriptorSetLayout
@@ -297,16 +195,17 @@ void CBindlessResources::init() {
 		};
 
 		mPipelineLayout = VRICreatePipelineLayout(
-			1,
-			&mDescriptorSetLayout->get(),
-			(uint32)pushConstants.size(),
-			pushConstants.begin()
+			{
+				setIndexPool.descriptor.mDescriptorSetLayout,
+				fixedSizePool.descriptor.mDescriptorSetLayout
+			},
+			{ pushConstants }
 		);
-	}*/
+	}
 }
 
 void CBindlessResources::destroy() {
 	mPipelineLayout.destroy();
-	mDescriptorSetLayout.destroy();
-	mDescriptorPool.destroy();
+	fixedSizePool.destroy();
+	setIndexPool.destroy();
 }

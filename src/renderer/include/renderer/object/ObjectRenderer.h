@@ -4,6 +4,7 @@
 #include <type_traits>
 
 #include "basic/core/Common.h"
+#include "basic/core/Class.h"
 #include "basic/core/Registry.h"
 #include "rendercore/RenderStack.h"
 

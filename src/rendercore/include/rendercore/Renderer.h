@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include "basic/core/Common.h"
 #include "sstl/Array.h"
+#include "basic/core/Common.h"
+#include "basic/core/Object.h"
 
 // Forward declare vkb types
 namespace vkb {

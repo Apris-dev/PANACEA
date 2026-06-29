@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sptr/Unique.h"
 #include "VRI/resources/VRIResources.h"
 #include "VRI/resources/VRIBuffer.h"
 

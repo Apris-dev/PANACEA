@@ -4,6 +4,7 @@
 #include "sptr/Memory.h"
 
 #include "basic/core/Common.h"
+#include "basic/core/Object.h"
 
 #define MAKE_SINGLETON(n) \
 	private: \

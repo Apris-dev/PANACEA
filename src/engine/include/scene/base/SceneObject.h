@@ -3,6 +3,7 @@
 #include "rendercore/Instancer.h"
 #include "basic/core/Object.h"
 #include "basic/core/Class.h"
+#include "basic/core/Hierarchy.h"
 
 class CSceneObject : public SObject {
 public:

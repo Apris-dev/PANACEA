@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sptr/Unique.h"
 #include "VRI/resources/VRIResources.h"
 
 //The Layout is a Template, the Pool is the Memory, and the Set is the Instance.

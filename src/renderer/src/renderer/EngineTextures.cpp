@@ -20,6 +20,7 @@ CEngineTextures::CEngineTextures(const TFrail<CRenderer>& renderer) {
 	// Initialize samplers
 	// Default samplers repeat and do not have anisotropy
 	{
+
 		VkSamplerCreateInfo samplerCreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
 			.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
@@ -31,49 +32,19 @@ CEngineTextures::CEngineTextures(const TFrail<CRenderer>& renderer) {
 		samplerCreateInfo.minFilter = VK_FILTER_NEAREST;
 		samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
 
-		mNearestSampler = VRICreateSampler(samplerCreateInfo);
+		mNearestSampler = SSetIndexPool::createSampler("SAMPLER_NEAREST", samplerCreateInfo);
 
 		samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
 		samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
 		samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-		mLinearSampler = VRICreateSampler(samplerCreateInfo);
-
-		const auto imageDescriptorInfo = VkDescriptorImageInfo{
-			.sampler = mNearestSampler->get()};
-
-		const auto writeSet = VkWriteDescriptorSet{
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet = CBindlessResources::getBindlessDescriptorSet()->get(),
-			.dstBinding = gSamplerBinding,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
-			.pImageInfo = &imageDescriptorInfo,
-		};
-
-		const auto imageDescriptorInfo2 = VkDescriptorImageInfo{
-			.sampler = mLinearSampler->get()};
-
-		const auto writeSet2 = VkWriteDescriptorSet{
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet = CBindlessResources::getBindlessDescriptorSet()->get(),
-			.dstBinding = gSamplerBinding,
-			.dstArrayElement = 1,
-			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
-			.pImageInfo = &imageDescriptorInfo2,
-		};
-
-		const auto sets = {writeSet, writeSet2};
-
-		vkUpdateDescriptorSets(CVRI::get()->getDevice()->device, (uint32)sets.size(), sets.begin(), 0, nullptr);
+		mLinearSampler = SSetIndexPool::createSampler("SAMPLER_LINEAR", samplerCreateInfo);
 	}
 
 	// Error checkerboard image
 	const uint32 red = glm::packUnorm4x8(glm::vec4(1, 0, 0, 1));
 	const uint32 black = glm::packUnorm4x8(glm::vec4(0, 0, 0, 1));
-	std::array<uint32, 16 * 16> pixels{}; //for 16x16 checkerboard texture
+	TArray<uint32, 16 * 16> pixels; //for 16x16 checkerboard texture
 	for (int x = 0; x < 16; x++) {
 		for (int y = 0; y < 16; y++) {
 			pixels[y*16 + x] = (x % 2 ^ y % 2) ? red : black;

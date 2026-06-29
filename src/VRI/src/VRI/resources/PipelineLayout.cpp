@@ -4,15 +4,15 @@
 
 #include "VRI/VRI.h"
 
-TUnique<CPipelineLayout> VRICreatePipelineLayout(const uint32 setLayoutCount, const VkDescriptorSetLayout* setLayouts, const uint32 pushConstantRangeCount, const VkPushConstantRange* pushConstantRages, const CPipelineLayout::Flags flags) {
+TUnique<CPipelineLayout> VRICreatePipelineLayout(const TVector<VkDescriptorSetLayout>& setLayouts, const TVector<VkPushConstantRange>& pushConstantRanges, CPipelineLayout::Flags flags) {
     const VkPipelineLayoutCreateInfo createInfo {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
         .pNext = nullptr,
         .flags = static_cast<VkPipelineLayoutCreateFlags>(flags),
-        .setLayoutCount = setLayoutCount,
-        .pSetLayouts = setLayouts,
-        .pushConstantRangeCount = pushConstantRangeCount,
-        .pPushConstantRanges = pushConstantRages
+        .setLayoutCount = static_cast<uint32>(setLayouts.getSize()),
+        .pSetLayouts = setLayouts.data(),
+        .pushConstantRangeCount = static_cast<uint32>(pushConstantRanges.getSize()),
+        .pPushConstantRanges = pushConstantRanges.data()
    };
     TUnique<CPipelineLayout> pipelineLayout;
     VK_CHECK(vkCreatePipelineLayout(CVRI::get()->getDevice()->device, &createInfo, nullptr, &pipelineLayout->mPipelineLayout));

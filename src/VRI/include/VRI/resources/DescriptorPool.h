@@ -1,8 +1,9 @@
 #pragma once
 
+#include "sptr/Unique.h"
+#include "sstl/Vector.h"
 #include "VRI/resources/VRIResources.h"
 
-#include "sstl/Vector.h"
 
 FORWARD_VK_TYPE(VkDescriptorPool);
 

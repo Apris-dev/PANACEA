@@ -26,10 +26,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 add_subdirectory(third_party)
 
-option(SIMPLEPTR_INIT "" ON)
-option(SIMPLEPTR_DESTROY "" ON)
-option(SIMPLEPTR_RELEASE "" ON)
-add_subdirectory(third_party/simplecpp)
+define_project(PANACEA ${CMAKE_CXX_STANDARD})
+
+# TODO: SimpleCPP VCPKG implementation (external packages)
 find_package(glm CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(directx-dxc CONFIG REQUIRED)

@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include "basic/core/Common.h"
 #include "rendercore/Renderer.h"
+#include "basic/core/Common.h"
+#include "basic/core/Class.h"
 
 class CInput;
 

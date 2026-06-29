@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sptr/Unique.h"
 #include "VRI/resources/VRIResources.h"
 
 struct CSemaphore : SVRIResource {

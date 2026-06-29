@@ -2,6 +2,7 @@
 
 #include <vma/vk_mem_alloc.h>
 
+#include "sptr/Frail.h"
 #include "VRI/resources/VRIResources.h"
 
 struct SVRIImage : SVRIResource {

@@ -3,6 +3,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "rendercore/VulkanResources.h"
+#include "basic/core/Class.h"
 
 class CVRICommands;
 class CObjectRenderer;

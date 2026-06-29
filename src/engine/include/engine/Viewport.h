@@ -3,6 +3,10 @@
 //TODO: engine shouldn't have
 #include <vulkan/vulkan_core.h>
 
+#include "basic/core/Common.h"
+#include "basic/core/Object.h"
+#include "basic/core/Class.h"
+
 class CEngineViewport : public SObject, public TDirtyable<>, public IDestroyable {
 
 	REGISTER_CLASS(CEngineViewport, SObject)

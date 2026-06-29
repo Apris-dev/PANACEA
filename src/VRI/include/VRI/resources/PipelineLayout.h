@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sptr/Unique.h"
+#include "sstl/Vector.h"
 #include "VRI/resources/VRIResources.h"
 
 struct CPipelineLayout : SVRIResource {
@@ -16,8 +18,8 @@ struct CPipelineLayout : SVRIResource {
     virtual std::function<void()> getDestroyer() override;
 
 private:
-    EXPORT friend TUnique<CPipelineLayout> VRICreatePipelineLayout(uint32, const VkDescriptorSetLayout*, uint32, const VkPushConstantRange*, Flags);
+    EXPORT friend TUnique<CPipelineLayout> VRICreatePipelineLayout(const TVector<VkDescriptorSetLayout>&, const TVector<VkPushConstantRange>&, Flags);
     VkPipelineLayout mPipelineLayout = nullptr;
 };
 
-EXPORT TUnique<CPipelineLayout> VRICreatePipelineLayout(uint32 setLayoutCount, const VkDescriptorSetLayout* setLayouts, uint32 pushConstantRangeCount, const VkPushConstantRange* pushConstantRages, CPipelineLayout::Flags flags = CPipelineLayout::NONE);
+EXPORT TUnique<CPipelineLayout> VRICreatePipelineLayout(const TVector<VkDescriptorSetLayout>& setLayouts, const TVector<VkPushConstantRange>& pushConstantRanges, CPipelineLayout::Flags flags = CPipelineLayout::NONE);

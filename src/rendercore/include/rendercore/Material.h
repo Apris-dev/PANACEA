@@ -3,6 +3,9 @@
 #include <array>
 
 #include "sstl/Array.h"
+#include "basic/core/Common.h"
+#include "basic/core/Object.h"
+#include "basic/core/Class.h"
 
 enum class EMaterialPass : uint8 {
 	OPAQUE,

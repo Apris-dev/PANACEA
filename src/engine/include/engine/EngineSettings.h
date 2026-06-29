@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "basic/core/Singleton.h"
+#include "basic/core/Class.h"
 
 class CGuiText;
 class CCommand;
