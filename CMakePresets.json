@@ -13,14 +13,14 @@
       "binaryDir": "${sourceDir}/build/${presetName}"
     },
     {
-      "name": "PANACEA-Debug",
+      "name": "Debug",
       "inherits": "Base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "PANACEA-Release",
+      "name": "Release",
       "inherits": "Base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
