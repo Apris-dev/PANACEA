@@ -38,6 +38,8 @@ void SVRIBuffer::makeGlobal() {
 }
 
 void SVRIBuffer::updateGlobal() const {
+	SSetIndexPool& setIndexPool = CBindlessResources::get()->setIndexPool;
+
 	//TODO: need some way of guaranteeing Buffer addresses so they don't have to be passed in push constants
 	const auto bufferDescriptorInfo = VkDescriptorBufferInfo{
 		.buffer = buffer,
@@ -47,8 +49,8 @@ void SVRIBuffer::updateGlobal() const {
 
 	const auto writeSet = VkWriteDescriptorSet{
 		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		.dstSet = CBindlessResources::getBindlessDescriptorSet()->get(),
-		.dstBinding = gUBOBinding, //TODO: for now UBO bindings
+		.dstSet = setIndexPool.descriptor.mDescriptorSet,
+		.dstBinding = SSetIndexPool::gUBOBinding, //TODO: for now UBO bindings
 		.dstArrayElement = mBindlessAddress,
 		.descriptorCount = 1,
 		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,

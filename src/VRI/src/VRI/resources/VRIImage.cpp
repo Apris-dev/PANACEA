@@ -68,6 +68,8 @@ SVRIImage::SVRIImage(const std::string_view& inDebugName, const VkExtent3D inExt
 		mBindlessAddress = gCurrentTextureAddress;
 		gCurrentTextureAddress++;
 
+		SFixedSizePool& fixSizedPool = CBindlessResources::get()->fixedSizePool;
+
 		const auto imageDescriptorInfo = VkDescriptorImageInfo{
 			.imageView = mImageView,
 			.imageLayout = VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL
@@ -75,8 +77,8 @@ SVRIImage::SVRIImage(const std::string_view& inDebugName, const VkExtent3D inExt
 
 		const auto writeSet = VkWriteDescriptorSet{
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet = CBindlessResources::getBindlessDescriptorSet()->get(),
-			.dstBinding = gTextureBinding,
+			.dstSet = fixSizedPool.descriptor.mDescriptorSet,
+			.dstBinding = SFixedSizePool::gTextureBinding,
 			.dstArrayElement = mBindlessAddress,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,

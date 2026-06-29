@@ -96,6 +96,7 @@ public:
 
 	EXPORT void bindPipeline(const TFrail<SPipeline>& pipeline, VkPipelineBindPoint inBindPoint) const;
 	EXPORT void bindDescriptorSets(const TFrail<CDescriptorSet>& descriptorSet, VkPipelineBindPoint inBindPoint, VkPipelineLayout inPipelineLayout, uint32 inFirstSet, uint32 inDescriptorSetCount) const;
+	EXPORT void bindDescriptorSets(const VkDescriptorSet& descriptorSet, VkPipelineBindPoint inBindPoint, VkPipelineLayout inPipelineLayout, uint32 inFirstSet, uint32 inDescriptorSetCount) const;
 
     /*
      * Image Commands

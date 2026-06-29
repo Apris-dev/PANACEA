@@ -57,7 +57,11 @@ void CVRICommands::bindPipeline(const TFrail<SPipeline>& pipeline, const VkPipel
 }
 
 void CVRICommands::bindDescriptorSets(const TFrail<CDescriptorSet>& descriptorSet, VkPipelineBindPoint inBindPoint, VkPipelineLayout inPipelineLayout, uint32 inFirstSet, uint32 inDescriptorSetCount) const {
-	vkCmdBindDescriptorSets(cmd, inBindPoint,inPipelineLayout, inFirstSet, inDescriptorSetCount, &descriptorSet->get(), 0, nullptr);
+	bindDescriptorSets(descriptorSet->get(), inBindPoint, inPipelineLayout, inFirstSet, inDescriptorSetCount);
+}
+
+void CVRICommands::bindDescriptorSets(const VkDescriptorSet& descriptorSet, VkPipelineBindPoint inBindPoint, VkPipelineLayout inPipelineLayout, uint32 inFirstSet, uint32 inDescriptorSetCount) const {
+	vkCmdBindDescriptorSets(cmd, inBindPoint,inPipelineLayout, inFirstSet, inDescriptorSetCount, &descriptorSet, 0, nullptr);
 }
 
 void CVRICommands::blitImage(const TFrail<SVRIImage>& inSource, const TFrail<SVRIImage>& inDestination, const Extent32u inSrcSize, const Extent32u inDstSize) const {

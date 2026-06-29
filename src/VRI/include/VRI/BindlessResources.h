@@ -171,7 +171,7 @@ public:
 		return get()->fixedSizePool.descriptor.mDescriptorSet;
 	}
 
-private:
+public: //TODO: change
 
 	SSetIndexPool setIndexPool;
 	SFixedSizePool fixedSizePool;
