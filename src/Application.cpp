@@ -1,9 +1,13 @@
-﻿
-// This include ensures static calls are done before main (even in libraries)
-// Without it, the linker might drop symbols that need to run before main (like factory registration)
-#include "Sources.h"
+﻿#include "basic/core/Common.h"
+#include "editor/EditorRenderer.h"
+#include "engine/Engine.h"
 
-int main() {
+void run_engine() {
+	// Tell Engine to use CEditorRenderer, which has certain passes
+	CEngine::run<CEditorRenderer>();
+}
+
+extern "C" EXPORT int run() {
 
 #ifdef BUILD_DEBUG
 	msgs("Engine Initialized with profile 'Debug'");
@@ -12,8 +16,7 @@ int main() {
 	msgs("Engine Initialized with profile 'Release'");
 #endif
 
-	// Tell Engine to use CEditorRenderer, which has certain passes
-	CEngine::run<CEditorRenderer>();
+	run_engine();
 
 	return 0;
 }

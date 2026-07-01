@@ -7,6 +7,9 @@
         include/VRI/BindlessResources.h
         src/VRI/BindlessResouces.cpp
 
+        include/VRI/VRISamplers.h
+        src/VRI/VRISamplers.cpp
+
         include/VRI/VRI.h
         src/VRI/VRI.cpp
 

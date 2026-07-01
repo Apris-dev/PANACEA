@@ -44,8 +44,8 @@
 )
 
 link_package(PRIVATE SDL3::SDL3)
-link_package(PRIVATE PANACEA-rendercore)
 link_package(PRIVATE PANACEA-imgui)
 
 link_package(PUBLIC PANACEA-basic)
+link_package(PUBLIC PANACEA-rendercore)
 link_package(PUBLIC PANACEA-VRI)

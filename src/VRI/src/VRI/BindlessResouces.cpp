@@ -12,6 +12,7 @@
 #include "VRI/resources/PipelineLayout.h"
 #include "VRI/resources/Sampler.h"
 
+//TODO: created first when called, if outside get(), created at init.
 TUnique<CBindlessResources>& CBindlessResources::get() {
 	static TUnique<CBindlessResources> bindlessResources{};
 	return bindlessResources;
@@ -147,39 +148,11 @@ void SDescriptor::destroy() const {
 	vkDestroyDescriptorPool(CVRI::get()->getDevice()->device, mDescriptorPool, nullptr);
 }
 
-
-
-TUnique<CSampler> SSetIndexPool::createSampler(const std::string_view inName, const VkSamplerCreateInfo& inCreateInfo) {
-	SSetIndexPool& setIndexPool = CBindlessResources::get()->setIndexPool;
-
-	TUnique<CSampler> sampler = VRICreateSampler(inCreateInfo);
-
-	const auto imageDescriptorInfo = VkDescriptorImageInfo{
-		.sampler = sampler->get()
-	};
-
-	// Add samplers to tracking
-	const uint32 currentSampler = setIndexPool.samplerIndexes.push(std::string(inName));
-
-	const auto writeSet = VkWriteDescriptorSet{
-		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		.dstSet = setIndexPool.descriptor.mDescriptorSet,
-		.dstBinding = gSamplerBinding,
-		.dstArrayElement = currentSampler,
-		.descriptorCount = 1,
-		.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
-		.pImageInfo = &imageDescriptorInfo,
-	};
-
-	const auto sets = {writeSet};
-
-	vkUpdateDescriptorSets(CVRI::get()->getDevice()->device, static_cast<uint32>(sets.size()), sets.begin(), 0, nullptr);
-
-	return std::move(sampler);
-}
-
 //TODO: various uses of device singleton, need to remove
 void CBindlessResources::init() {
+
+	msgs("Created Bindless Resources");
+
 	setIndexPool.init();
 	fixedSizePool.init();
 

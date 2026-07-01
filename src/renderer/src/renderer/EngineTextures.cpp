@@ -17,30 +17,6 @@
 
 CEngineTextures::CEngineTextures(const TFrail<CRenderer>& renderer) {
 
-	// Initialize samplers
-	// Default samplers repeat and do not have anisotropy
-	{
-
-		VkSamplerCreateInfo samplerCreateInfo = {
-			.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-			.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-			.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-			.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT
-		};
-
-		samplerCreateInfo.magFilter = VK_FILTER_NEAREST;
-		samplerCreateInfo.minFilter = VK_FILTER_NEAREST;
-		samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
-
-		mNearestSampler = SSetIndexPool::createSampler("SAMPLER_NEAREST", samplerCreateInfo);
-
-		samplerCreateInfo.magFilter = VK_FILTER_LINEAR;
-		samplerCreateInfo.minFilter = VK_FILTER_LINEAR;
-		samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-
-		mLinearSampler = SSetIndexPool::createSampler("SAMPLER_LINEAR", samplerCreateInfo);
-	}
-
 	// Error checkerboard image
 	const uint32 red = glm::packUnorm4x8(glm::vec4(1, 0, 0, 1));
 	const uint32 black = glm::packUnorm4x8(glm::vec4(0, 0, 0, 1));
@@ -103,7 +79,5 @@ void CEngineTextures::destroy() {
 		mDrawImage.destroy();
 		mDepthImage.destroy();
 	}
-	mLinearSampler.destroy();
-	mNearestSampler.destroy();
 }
 

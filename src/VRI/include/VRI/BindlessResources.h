@@ -54,24 +54,41 @@ struct SDescriptor {
  *  - Non-Runtime Textures, like the error material (index 0)
  */
 
+// TODO:
+// If wanting to do a SIP per plugin, how would plugin's access cross-plugin resources (or base engine resources) in their respective SIPs
+// If wanted to do one global SIP, how do you prevent index collision when written statically.
+// Either this or the SIP is only allocated by the engine, issue would be engine plugins and collision.
+
+// TODO: add SIP per plugin if requested, the types can always point to the same resources.
+// This allows for better separation and negligible memory footprint
+
+/*
+SAMPLER			16–32 bytes	Contains sampler state or a pointer/index to it.
+SAMPLED_IMAGE	32–64 bytes	Usually contains image metadata, layout information, and GPU addresses or handles.
+UNIFORM_BUFFER	16–32 bytes	Typically stores a GPU address plus range/offset.
+STORAGE_BUFFER	16–32 bytes	Similar to uniform buffers but with storage semantics.
+
+32 * 32 =	1024
+256 * 32 =	8192
+256 * 32 =	8192
+
+TOTAL =		17408 bytes (or 17.4 KB)
+With 1000 plugins would be 17.4 MB
+ */
+
+//TODO: samplers can be separate, they should not be allocated per plugin.
 struct SSetIndexPool {
-	constexpr static uint32 gMaxSamplers = 256;
-	constexpr static uint32 gMaxUniformBuffers = 4096;
+	constexpr static uint32 gMaxUniformBuffers = 256;
 	constexpr static uint32 gMaxStorageBuffers = 256;
 
-	constexpr static uint32 gSamplerBinding = 0;
 	constexpr static uint32 gUBOBinding = 1;
 	constexpr static uint32 gSSBOBinding = 2;
 
 	constexpr static TArray pools {
-		SDescriptor::Pool{gSamplerBinding, SDescriptor::Pool::SAMPLER, gMaxSamplers},
 		SDescriptor::Pool{gUBOBinding, SDescriptor::Pool::UNIFORM_BUFFER, gMaxUniformBuffers},
 		SDescriptor::Pool{gSSBOBinding, SDescriptor::Pool::STORAGE_BUFFER, gMaxStorageBuffers}
 	};
 
-	EXPORT static TUnique<struct CSampler> createSampler(std::string_view inName, const VkSamplerCreateInfo& inCreateInfo);
-
-	TVector<std::string> samplerIndexes;
 	SDescriptor descriptor;
 
 	void init() {

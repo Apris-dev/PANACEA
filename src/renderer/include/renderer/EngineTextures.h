@@ -28,14 +28,6 @@ public:
 	EXPORT virtual void destroy() override;
 
 	//
-	// Samplers
-	//
-
-	TUnique<CSampler> mNearestSampler = nullptr;
-
-	TUnique<CSampler> mLinearSampler = nullptr;
-
-	//
 	// Default Data
 	//
 

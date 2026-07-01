@@ -34,7 +34,7 @@ public:
 private:
 
 	// Make sure only main can access init and run functions
-	friend int main();
+	friend void run_engine();
 
 	EXPORT void run_internal();
 
