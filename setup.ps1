@@ -6,12 +6,12 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
     # Setup original path (Push-Location is the PS equivalent of saving the path)
     Push-Location $PSScriptRoot
 
-    # Ensure SimpleCPP is cloned (and vcpkg scripts are)
+    # Ensure cppns is cloned (and vcpkg scripts are)
     git submodule sync --recursive
     git submodule update --init --remote --recursive
 
     # Run setup_vcpkg script which ensures vcpkg exists
-    $vcpkgScript = Join-Path (Get-Location) "third_party/simplecpp/scripts/setup_vcpkg.ps1"
+    $vcpkgScript = Join-Path (Get-Location) "third_party/cppns/scripts/setup_vcpkg.ps1"
     
 	# Only run script if found
     if (Test-Path $vcpkgScript) {

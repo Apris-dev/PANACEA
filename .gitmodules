@@ -1,4 +1,3 @@
-[submodule "third_party/simplecpp"]
-	path = third_party/simplecpp
-	url = https://github.com/Apris-dev/SimpleCPP.git
-	branch = main
+[submodule "third_party/cppns"]
+	path = third_party/cppns
+	url = https://github.com/Apris-dev/cppns.git

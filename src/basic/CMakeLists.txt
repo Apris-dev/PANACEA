@@ -27,7 +27,7 @@
         src/basic/control/ResourceManager.cpp
 )
 
-link_package(PUBLIC SimpleCPP)
+link_package(PUBLIC cppns)
 link_package(PUBLIC glm::glm-header-only)
 link_package(PUBLIC fmt::fmt)
 link_package(PUBLIC Tracy::TracyClient)

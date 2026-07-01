@@ -8,12 +8,12 @@ if command -v git >/dev/null 2>&1; then
 	# Move into script directory
 	cd "$(dirname -- "${BASH_SOURCE[0]:-$0}")"
 
-	# Ensure SimpleCPP is cloned (and vcpkg scripts are)
+	# Ensure cppns is cloned (and vcpkg scripts are)
 	git submodule sync --recursive
 	git submodule update --init --remote --recursive
 
 	# Run setup_vcpkg script which ensures vcpkg exists
-	vcpkgScript=$(pwd)/third_party/simplecpp/scripts/setup_vcpkg.sh
+	vcpkgScript=$(pwd)/third_party/cppns/scripts/setup_vcpkg.sh
 	
 	# Only run script if found
 	if [ -f "$vcpkgScript" ]; then

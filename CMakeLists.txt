@@ -6,7 +6,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 # Project Definition
 
-include(third_party/simplecpp/scripts/setup_vcpkg.cmake)
+include(third_party/cppns/scripts/setup_vcpkg.cmake)
 
 # Ensures vcpkg toolchain
 setup_vcpkg()
@@ -28,7 +28,7 @@ add_subdirectory(third_party)
 
 define_project(PANACEA ${CMAKE_CXX_STANDARD})
 
-# TODO: SimpleCPP VCPKG implementation (external packages)
+# TODO: cppns VCPKG implementation (external packages)
 find_package(glm CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(directx-dxc CONFIG REQUIRED)
