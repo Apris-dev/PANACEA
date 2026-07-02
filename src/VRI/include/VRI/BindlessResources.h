@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "sstl/Array.h"
-#include "sstl/Span.h"
-#include "sstl/Vector.h"
+#include "cppns/container/Array.h"
+#include "cppns/container/Span.h"
+#include "cppns/container/Vector.h"
 #include "basic/core/Object.h"
 #include "basic/core/Class.h"
 #include "VRI/resources/VRIResources.h"

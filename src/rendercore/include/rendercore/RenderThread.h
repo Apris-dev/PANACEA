@@ -3,9 +3,9 @@
 #include <functional>
 
 #include "Renderer.h"
-#include "sptr/Memory.h"
-#include "sstl/Vector.h"
-#include "sutil/Threading.h"
+#include "cppns/memory/Memory.h"
+#include "cppns/container/Vector.h"
+#include "cppns/util/Threading.h"
 
 #include "tracy/Tracy.hpp"
 #include "tracy/TracyC.h"

@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "basic/core/Common.h"
-#include "sptr/Memory.h"
-#include "sstl/PriorityMap.h"
+#include "cppns/memory/Memory.h"
+#include "cppns/container/PriorityMap.h"
 
 namespace vkb {
 	struct Instance;

@@ -7,7 +7,7 @@
 #include "Font.h"
 #include "basic/core/Paths.h"
 #include "rendercore/StaticMesh.h"
-#include "sarch/FileArchive.h"
+#include "cppns/archive/FileArchive.h"
 
 struct SStaticMesh;
 class CMaterial;

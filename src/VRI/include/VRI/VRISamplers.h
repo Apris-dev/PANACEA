@@ -4,7 +4,7 @@
 #include "basic/core/Class.h"
 #include "basic/core/Object.h"
 #include "resources/Sampler.h"
-#include "sstl/Array.h"
+#include "cppns/container/Array.h"
 
 class CVRISamplers final : public SObject {
 

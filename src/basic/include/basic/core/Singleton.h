@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sstl/Map.h"
-#include "sptr/Memory.h"
+#include "cppns/container/Map.h"
+#include "cppns/memory/Memory.h"
 
 #include "basic/core/Common.h"
 #include "basic/core/Object.h"

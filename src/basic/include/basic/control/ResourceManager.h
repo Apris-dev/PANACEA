@@ -4,8 +4,8 @@
 
 #include "basic/core/Common.h"
 #include "basic/core/Object.h"
-#include "sstl/List.h"
-#include "sptr/Memory.h"
+#include "cppns/container/List.h"
+#include "cppns/memory/Memory.h"
 
 /*
  * Stores pointers to CObject so they can be automatically deallocated when flush is called

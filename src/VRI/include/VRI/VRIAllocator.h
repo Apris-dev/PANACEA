@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include "VRISwapchain.h"
-#include "sstl/Array.h"
-#include "sptr/Memory.h"
-#include "sstl/Queue.h"
+#include "cppns/container/Array.h"
+#include "cppns/memory/Memory.h"
+#include "cppns/container/Queue.h"
 #include "VRI/resources/VRIResources.h"
 
 #include "VRI/VRI.h"

@@ -16,7 +16,7 @@ CVRIAllocator::CVRIAllocator() {
 
 void CVRIAllocator::destroy2() {
 
-    for (size_t overlap = 0; overlap < CVRI::get()->getSwapchain()->m_Buffering.getFrameOverlap(); ++overlap) {
+    for (size_t overlap = 0; overlap < CDoubleBuffering::getFrameOverlap(); ++overlap) {
         popDeferredQueue(overlap);
     }
 

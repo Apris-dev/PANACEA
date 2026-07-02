@@ -7,7 +7,7 @@
 #include "basic/core/Class.h"
 #include "rendercore/Renderer.h"
 #include "rendercore/VulkanResources.h"
-#include "sutil/Threading.h"
+#include "cppns/util/Threading.h"
 #include "VRI/VRISwapchain.h"
 #include "VRI/resources/CommandPool.h"
 

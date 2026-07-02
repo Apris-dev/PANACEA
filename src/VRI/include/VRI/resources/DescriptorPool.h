@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sptr/Unique.h"
-#include "sstl/Vector.h"
+#include "cppns/memory/Unique.h"
+#include "cppns/container/Vector.h"
 #include "VRI/resources/VRIResources.h"
 
 

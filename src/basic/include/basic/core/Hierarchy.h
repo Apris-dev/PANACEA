@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sarch/Archive.h"
-#include "sstl/List.h"
+#include "cppns/archive/Archive.h"
+#include "cppns/container/List.h"
 
 template <typename TType>
 struct THierarchy {

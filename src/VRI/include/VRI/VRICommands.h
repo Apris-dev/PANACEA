@@ -3,7 +3,8 @@
 #include <vulkan/vulkan_core.h>
 
 #include "VRI/resources/VRIResources.h"
-#include "sstl/ForwardList.h"
+#include "cppns/container/ForwardList.h"
+#include "cppns/memory/Frail.h"
 
 struct CCommandPool;
 struct SPipeline;
